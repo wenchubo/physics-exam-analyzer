@@ -1,619 +1,541 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-const bank = [
+const features = [
   {
-    question: "关于质点，下列说法正确的是？",
-    options: [
-      "A. 任何物体都能看作质点",
-      "B. 研究地球公转时，地球可以看作质点",
-      "C. 质点没有质量",
-      "D. 质点是不存在的物体",
-    ],
-    answer: "B",
-    explanation:
-      "当物体的大小和形状对研究问题的影响可以忽略时，可以将物体看作质点。",
-    knowledgePoint: "质点",
+    number: "01",
+    icon: "📚",
+    title: "知识学习",
+    subtitle: "把物理知识装进自己的工具箱",
+    description: "知识卡片 · 核心公式 · 易错提醒",
+    color: "blue",
+    href: "/physics-exam-analyzer/knowledge/index.html",
+    button: "开始学习 ↗",
   },
   {
-    question: "下列物理量中，属于矢量的是？",
-    options: ["A. 时间", "B. 路程", "C. 位移", "D. 速率"],
-    answer: "C",
-    explanation:
-      "位移既有大小，又有方向，是矢量；时间、路程和速率是标量。",
-    knowledgePoint: "位移",
+    number: "02",
+    icon: "📝",
+    title: "练习中心",
+    subtitle: "在一次次练习中找到突破口",
+    description: "精选题目 · 自动批改 · 答题解析",
+    color: "orange",
+    href: "/physics-exam-analyzer/practice.html",
+    button: "开始练习 ↗",
   },
   {
-    question:
-      "某物体在 4 s 内由静止加速到 12 m/s，其平均加速度是多少？",
-    options: [
-      "A. 2 m/s²",
-      "B. 3 m/s²",
-      "C. 4 m/s²",
-      "D. 48 m/s²",
-    ],
-    answer: "B",
-    explanation: "a=(v-v₀)/t=(12-0)/4=3 m/s²。",
-    knowledgePoint: "加速度",
+    number: "03",
+    icon: "📒",
+    title: "我的错题本",
+    subtitle: "把做错的题变成真正掌握的题",
+    description: "错题回顾 · 反复练习 · 错因整理",
+    color: "pink",
+    href: "/physics-exam-analyzer/practice.html",
+    button: "复习错题 ↗",
   },
   {
-    question: "关于速度和加速度，下列说法正确的是？",
-    options: [
-      "A. 速度越大，加速度一定越大",
-      "B. 速度变化越大，加速度一定越大",
-      "C. 加速度描述速度变化的快慢",
-      "D. 加速度为零，速度一定为零",
-    ],
-    answer: "C",
-    explanation:
-      "加速度描述速度变化的快慢。速度大不代表加速度大，加速度为零时速度可以不为零。",
-    knowledgePoint: "加速度",
-  },
-  {
-    question:
-      "物体做匀变速直线运动，初速度为 2 m/s，加速度为 3 m/s²，3 s 末速度是多少？",
-    options: [
-      "A. 5 m/s",
-      "B. 8 m/s",
-      "C. 9 m/s",
-      "D. 11 m/s",
-    ],
-    answer: "D",
-    explanation: "由 v=v₀+at，得 v=2+3×3=11 m/s。",
-    knowledgePoint: "匀变速直线运动",
-  },
-  {
-    question:
-      "自由落体运动的物体，在不计空气阻力时，其加速度如何？",
-    options: [
-      "A. 越来越大",
-      "B. 越来越小",
-      "C. 始终为零",
-      "D. 始终为重力加速度 g",
-    ],
-    answer: "D",
-    explanation:
-      "自由落体运动只受重力作用，加速度始终为重力加速度 g。",
-    knowledgePoint: "自由落体",
-  },
-  {
-    question:
-      "一物体受到两个同一直线、同方向的力，大小分别为 3 N 和 5 N，合力大小是多少？",
-    options: ["A. 2 N", "B. 3 N", "C. 5 N", "D. 8 N"],
-    answer: "D",
-    explanation:
-      "同一直线上同方向的两个力，合力大小等于二力之和：3+5=8 N。",
-    knowledgePoint: "力的合成",
-  },
-  {
-    question: "关于弹力，下列说法正确的是？",
-    options: [
-      "A. 只有弹簧才能产生弹力",
-      "B. 相互接触的物体之间一定有弹力",
-      "C. 弹力是物体发生弹性形变时产生的相互作用",
-      "D. 弹力方向总是竖直向下",
-    ],
-    answer: "C",
-    explanation:
-      "弹力与物体间的弹性形变有关，方向与形变情况及接触方式有关。",
-    knowledgePoint: "弹力",
-  },
-  {
-    question: "物体做匀速直线运动时，其加速度是多少？",
-    options: [
-      "A. 0",
-      "B. 1 m/s²",
-      "C. 与速度相等",
-      "D. 不一定",
-    ],
-    answer: "A",
-    explanation:
-      "匀速直线运动的速度大小和方向均不变，因此加速度为零。",
-    knowledgePoint: "匀速直线运动",
-  },
-  {
-    question:
-      "一物体从静止开始做匀加速直线运动，加速度为 2 m/s²，2 s 内位移是多少？",
-    options: ["A. 2 m", "B. 4 m", "C. 6 m", "D. 8 m"],
-    answer: "B",
-    explanation:
-      "由 x=v₀t+½at²，得 x=0+½×2×2²=4 m。",
-    knowledgePoint: "位移公式",
+    number: "04",
+    icon: "📊",
+    title: "学习诊断",
+    subtitle: "看见自己的进步与薄弱知识点",
+    description: "知识点统计 · 薄弱环节 · 学习反馈",
+    color: "green",
+    href: "/physics-exam-analyzer/practice.html",
+    button: "查看诊断 ↗",
   },
 ];
 
-type Question = (typeof bank)[number];
+const experiments = [
+  { icon: "🚗", title: "加速度实验", detail: "小车 · 轨道 · 运动数据" },
+  { icon: "📈", title: "运动图像", detail: "观察位移、速度与时间" },
+  { icon: "⚖️", title: "力的合成", detail: "理解力的大小与方向" },
+];
 
-type WrongRecord = {
-  question: Question;
-  userAnswer: string;
-  wrongCount: number;
-  lastWrongAt: string;
-};
-
-const STORAGE_KEY = "physics-ai-wrong-book-v1";
-
-export default function PracticePage() {
-  const [topic, setTopic] = useState("");
-  const [count, setCount] = useState("5");
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [showAnswers, setShowAnswers] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const [wrongRecords, setWrongRecords] = useState<WrongRecord[]>([]);
-  const [showWrongBook, setShowWrongBook] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
-
-  // 读取浏览器中已经保存的错题
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-
-      if (saved) {
-        const parsed: unknown = JSON.parse(saved);
-
-        if (Array.isArray(parsed)) {
-          setWrongRecords(parsed as WrongRecord[]);
-        }
-      }
-    } catch {
-      console.error("读取错题本失败。");
-    } finally {
-      setHydrated(true);
-    }
-  }, []);
-
-  // 数据加载完成后，自动保存错题
-  useEffect(() => {
-    if (!hydrated) return;
-
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(wrongRecords));
-    } catch {
-      setMessage("错题保存失败，请检查浏览器的存储设置。");
-    }
-  }, [wrongRecords, hydrated]);
-
-  // 根据知识点筛选题目
-  function generateQuestions() {
-    const keywords = topic
-      .trim()
-      .toLowerCase()
-      .split(/[，,、\s]+/)
-      .filter(Boolean);
-
-    const matched = bank.filter(
-      (q) =>
-        keywords.length === 0 ||
-        keywords.some((word) =>
-          (
-            q.knowledgePoint +
-            q.question +
-            q.explanation
-          )
-            .toLowerCase()
-            .includes(word)
-        )
-    );
-
-    if (matched.length === 0) {
-      setQuestions([]);
-      setMessage(
-        "暂时没有匹配的题目。试试输入“加速度”“位移”或“弹力”。"
-      );
-      return;
-    }
-
-    const amount = Math.min(Number(count), matched.length);
-
-    setQuestions(matched.slice(0, amount));
-    setAnswers({});
-    setShowAnswers(false);
-    setHasSubmitted(false);
-    setMessage(`已生成 ${amount} 道练习题。`);
-  }
-
-  // 提交答案并自动记录错题
-  function submitAnswers() {
-    if (hasSubmitted) {
-      setShowAnswers(true);
-      return;
-    }
-
-    const incorrect = questions.filter(
-      (q, i) => answers[i] !== q.answer
-    );
-
-    const now = new Date().toISOString();
-
-    setWrongRecords((previous) => {
-      const updated = [...previous];
-
-      incorrect.forEach((q) => {
-        const existingIndex = updated.findIndex(
-          (record) => record.question.question === q.question
-        );
-
-        const userAnswer =
-          questions.findIndex(
-            (item) => item.question === q.question
-          ) >= 0
-            ? answers[
-                questions.findIndex(
-                  (item) => item.question === q.question
-                )
-              ] || "未作答"
-            : "未作答";
-
-        if (existingIndex >= 0) {
-          updated[existingIndex] = {
-            ...updated[existingIndex],
-            userAnswer,
-            wrongCount: updated[existingIndex].wrongCount + 1,
-            lastWrongAt: now,
-          };
-        } else {
-          updated.push({
-            question: q,
-            userAnswer,
-            wrongCount: 1,
-            lastWrongAt: now,
-          });
-        }
-      });
-
-      return updated;
-    });
-
-    const correctCount = questions.length - incorrect.length;
-
-    setHasSubmitted(true);
-    setShowAnswers(true);
-    setMessage(
-      `本次答对 ${correctCount} 道，答错 ${incorrect.length} 道。错题已自动记录。`
-    );
-  }
-
-  // 从错题本中移除已经掌握的题目
-  function removeWrongQuestion(questionText: string) {
-    setWrongRecords((previous) =>
-      previous.filter(
-        (record) => record.question.question !== questionText
-      )
-    );
-  }
-
-  // 将错题重新加入当前练习
-  function reviewWrongQuestion(record: WrongRecord) {
-    setQuestions([record.question]);
-    setAnswers({});
-    setShowAnswers(false);
-    setHasSubmitted(false);
-    setShowWrongBook(false);
-    setMessage("已载入错题，请重新作答。");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  // 统计各知识点错题数量
-  const topicStats = wrongRecords.reduce<Record<string, number>>(
-    (stats, record) => {
-      const point = record.question.knowledgePoint;
-      stats[point] = (stats[point] || 0) + 1;
-      return stats;
-    },
-    {}
-  );
-
-  const score = questions.filter(
-    (q, i) => answers[i] === q.answer
-  ).length;
+export default function HomePage() {
+  const [showExamInfo, setShowExamInfo] = useState(false);
 
   return (
-    <main className="min-h-screen bg-slate-50 px-5 py-8 text-slate-800">
-      <div className="mx-auto max-w-3xl">
-        <a
-          href="/physics-exam-analyzer/"
-          className="text-blue-600 hover:underline"
-        >
-          ← 返回首页
+    <main className="min-h-screen overflow-hidden bg-[#FAF8F2] text-[#26354A]">
+      {/* 顶部导航 */}
+      <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10">
+        <a href="/physics-exam-analyzer/" className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#DCEBFA] text-2xl">
+            ⚛
+          </div>
+          <div>
+            <p className="text-lg font-black tracking-wide">物理实验室</p>
+            <p className="text-[10px] tracking-[0.2em] text-[#8793A2]">
+              PHYSICS LAB
+            </p>
+          </div>
         </a>
 
-        <h1 className="mt-8 text-3xl font-bold">
-          高中物理个性化练习
-        </h1>
+        <div className="hidden items-center gap-7 text-sm text-[#68778A] md:flex">
+          <a href="#features" className="transition hover:text-[#4278B8]">
+            学习空间
+          </a>
+          <a href="#experiments" className="transition hover:text-[#4278B8]">
+            实验工坊
+          </a>
+          <a href="#about" className="transition hover:text-[#4278B8]">
+            关于本站
+          </a>
+        </div>
 
-        <p className="mt-3 leading-7 text-slate-500">
-          练习、订正、记录错题，逐步找到自己的知识漏洞。
-        </p>
+        <a
+          href="/physics-exam-analyzer/practice.html"
+          className="rounded-full border border-[#D9E0E8] bg-white px-4 py-2 text-sm font-semibold transition hover:border-[#8FB7E8]"
+        >
+          进入练习 →
+        </a>
+      </header>
 
-        {/* 错题统计 */}
-        <section className="mt-6 grid grid-cols-2 gap-4">
-          <div className="rounded-2xl bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">错题总数</p>
-            <p className="mt-2 text-3xl font-bold text-red-500">
-              {wrongRecords.length}
-            </p>
+      {/* 主视觉 */}
+      <section className="mx-auto grid max-w-7xl items-center gap-10 px-6 pb-16 pt-10 md:grid-cols-[1.05fr_0.95fr] md:px-10 md:pb-24 md:pt-16">
+        <div>
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#DCE7D8] bg-[#EFF4E9] px-4 py-2 text-xs font-semibold text-[#64805C]">
+            <span className="h-2 w-2 rounded-full bg-[#83A976]" />
+            YOUR PERSONAL PHYSICS SPACE
           </div>
 
-          <div className="rounded-2xl bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">累计答对</p>
-            <p className="mt-2 text-3xl font-bold text-green-600">
-              {hasSubmitted ? score : "—"}
-            </p>
-            <p className="mt-1 text-xs text-slate-400">
-              当前练习的答对题数
-            </p>
-          </div>
-        </section>
-
-        {/* 知识点诊断 */}
-        {Object.keys(topicStats).length > 0 && (
-          <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold">错题知识点统计</h2>
-
-            <div className="mt-4 space-y-4">
-              {Object.entries(topicStats)
-                .sort((a, b) => b[1] - a[1])
-                .map(([point, total]) => (
-                  <div key={point}>
-                    <div className="mb-2 flex justify-between text-sm">
-                      <span>{point}</span>
-                      <span className="text-red-500">
-                        {total} 道
-                      </span>
-                    </div>
-
-                    <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-                      <div
-                        className="h-full rounded-full bg-red-400"
-                        style={{
-                          width: `${
-                            (total / wrongRecords.length) * 100
-                          }%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </section>
-        )}
-
-        {/* 练习设置 */}
-        <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-bold">生成练习</h2>
-
-          <label className="mt-5 block font-semibold">
-            练习知识点
-          </label>
-
-          <input
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="例如：加速度、位移、弹力；留空表示全部"
-            className="mt-3 w-full rounded-xl border border-slate-200 p-3 outline-none focus:border-blue-500"
-          />
-
-          <label className="mt-5 block font-semibold">
-            题目数量
-          </label>
-
-          <select
-            value={count}
-            onChange={(e) => setCount(e.target.value)}
-            className="mt-3 w-full rounded-xl border border-slate-200 bg-white p-3"
-          >
-            <option value="5">5 道</option>
-            <option value="10">10 道</option>
-          </select>
-
-          <button
-            onClick={generateQuestions}
-            className="mt-6 w-full rounded-xl bg-blue-600 p-4 font-semibold text-white transition hover:bg-blue-700"
-          >
-            生成练习题
-          </button>
-
-          {message && (
-            <p className="mt-4 rounded-xl bg-blue-50 p-4 text-sm leading-6 text-blue-700">
-              {message}
-            </p>
-          )}
-        </section>
-
-        {/* 题目列表 */}
-        {questions.length > 0 && (
-          <section className="mt-8 space-y-5">
-            {questions.map((q, i) => (
-              <article
-                key={`${q.question}-${i}`}
-                className="rounded-2xl bg-white p-6 shadow-sm"
+          <h1 className="text-5xl font-black leading-[1.2] tracking-tight md:text-7xl">
+            让物理
+            <br />
+            <span className="relative inline-block text-[#5388C6]">
+              动起来
+              <svg
+                className="absolute -bottom-2 left-0 w-full"
+                viewBox="0 0 240 15"
+                fill="none"
+                aria-hidden="true"
               >
-                <p className="text-sm text-blue-600">
-                  {q.knowledgePoint}
-                </p>
+                <path
+                  d="M4 9 C55 1, 125 15, 236 5"
+                  stroke="#E9B66B"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
+          </h1>
 
-                <h2 className="mt-2 font-semibold leading-7">
-                  第 {i + 1} 题：{q.question}
-                </h2>
+          <p className="mt-8 max-w-lg text-base leading-8 text-[#788494] md:text-lg">
+            从一张试卷出发，找到知识漏洞；
+            从一道错题出发，理解物理规律。
+            在这里，把公式、练习和实验连接起来。
+          </p>
 
-                <div className="mt-4 space-y-3">
-                  {q.options.map((option) => {
-                    const selected = answers[i] === option[0];
-                    const isCorrect = option[0] === q.answer;
-
-                    let optionStyle =
-                      "flex cursor-pointer gap-3 rounded-xl border p-3 transition ";
-
-                    if (showAnswers && isCorrect) {
-                      optionStyle +=
-                        "border-green-300 bg-green-50 ";
-                    } else if (
-                      showAnswers &&
-                      selected &&
-                      !isCorrect
-                    ) {
-                      optionStyle +=
-                        "border-red-300 bg-red-50 ";
-                    } else {
-                      optionStyle +=
-                        "border-slate-200 hover:bg-slate-50 ";
-                    }
-
-                    return (
-                      <label key={option} className={optionStyle}>
-                        <input
-                          type="radio"
-                          name={`question-${i}`}
-                          checked={selected}
-                          disabled={hasSubmitted}
-                          onChange={() =>
-                            setAnswers((old) => ({
-                              ...old,
-                              [i]: option[0],
-                            }))
-                          }
-                          className="mt-1"
-                        />
-
-                        <span>{option}</span>
-
-                        {showAnswers && isCorrect && (
-                          <span className="ml-auto text-sm text-green-700">
-                            正确答案
-                          </span>
-                        )}
-                      </label>
-                    );
-                  })}
-                </div>
-
-                {showAnswers && (
-                  <div className="mt-5 rounded-xl bg-slate-50 p-4">
-                    <p className="font-semibold">
-                      正确答案：{q.answer}
-                    </p>
-
-                    <p className="mt-2 text-sm leading-6">
-                      {answers[i] === q.answer
-                        ? "回答正确！继续保持。"
-                        : answers[i]
-                          ? `你的答案是 ${answers[i]}，请对照解析检查思路。`
-                          : "你还没有作答，这道题已按未答题记录。"}
-                    </p>
-
-                    <p className="mt-3 text-sm leading-6 text-slate-600">
-                      <span className="font-semibold">解析：</span>
-                      {q.explanation}
-                    </p>
-                  </div>
-                )}
-              </article>
-            ))}
-
+          <div className="mt-9 flex flex-wrap gap-3">
             <button
-              onClick={submitAnswers}
-              disabled={hasSubmitted}
-              className="w-full rounded-xl bg-slate-800 p-4 font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+              onClick={() => setShowExamInfo(!showExamInfo)}
+              className="rounded-2xl bg-[#477FBD] px-6 py-4 font-bold text-white shadow-lg shadow-[#477FBD]/15 transition hover:-translate-y-0.5 hover:bg-[#376DA9]"
             >
-              {hasSubmitted
-                ? "已提交，错题已记录"
-                : "提交答案并自动记录错题"}
+              📄 开始试卷分析
+              <span className="ml-3">↗</span>
             </button>
-          </section>
-        )}
 
-        {/* 错题本 */}
-        <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
+            <a
+              href="/physics-exam-analyzer/knowledge/index.html"
+              className="rounded-2xl border border-[#E1DFD7] bg-white px-6 py-4 font-bold transition hover:-translate-y-0.5 hover:border-[#9CBDE1]"
+            >
+              翻开知识卡片
+            </a>
+          </div>
+
+          {showExamInfo && (
+            <div
+              id="exam-analysis"
+              className="mt-5 rounded-2xl border border-[#D9E5F2] bg-white p-5"
+            >
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">📄</span>
+                <div>
+                  <h2 className="font-bold">试卷分析工作台</h2>
+                  <p className="mt-2 text-sm leading-6 text-[#788494]">
+                    这里将用于上传试卷、录入你的作答，并结合标准答案和评分细则分析错题。
+                    当前版本还没有接入文件识别与自动阅卷服务。
+                  </p>
+                  <div className="mt-4 rounded-xl bg-[#F5F7FA] p-3 text-sm leading-6">
+                    <p>后续需要准备：</p>
+                    <p>① 完整试卷（图片或 PDF）</p>
+                    <p>② 你的作答内容</p>
+                    <p>③ 标准答案及评分细则</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-10 flex flex-wrap gap-6 text-sm text-[#8993A0]">
+            <span>✳ 从基础概念开始</span>
+            <span>✳ 记录每一次进步</span>
+            <span>✳ 用实验理解规律</span>
+          </div>
+        </div>
+
+        {/* 右侧插画区域 */}
+        <div className="relative mx-auto w-full max-w-xl">
+          <div className="absolute -right-3 top-5 h-24 w-24 rounded-full bg-[#F8DCA9]/60 blur-2xl" />
+          <div className="absolute -left-4 bottom-8 h-28 w-28 rounded-full bg-[#BFD9F5]/70 blur-2xl" />
+
+          <div className="relative rounded-[2rem] border border-white bg-[#F0EEE6] p-5 shadow-[0_25px_70px_rgba(50,65,80,0.08)] md:p-8">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold tracking-[0.18em] text-[#8C958F]">
+                THE LITTLE LAB
+              </span>
+              <span className="rounded-full bg-white px-3 py-1 text-xs text-[#8993A0]">
+                今日探索
+              </span>
+            </div>
+
+            <div className="relative mt-5 flex min-h-[270px] items-center justify-center overflow-hidden rounded-[1.5rem] bg-[#E2EAF0]">
+              <div className="absolute inset-0 opacity-40">
+                <div
+                  className="h-full w-full"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(#8BA4BB 1px, transparent 1px)",
+                    backgroundSize: "20px 20px",
+                  }}
+                />
+              </div>
+
+              <svg
+                viewBox="0 0 420 280"
+                className="relative w-full max-w-md"
+                role="img"
+                aria-label="小车沿斜面运动的物理实验示意图"
+              >
+                <path
+                  d="M48 218 L365 88"
+                  stroke="#A7B7C4"
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M48 218 L365 88"
+                  stroke="#F8FAFC"
+                  strokeWidth="3"
+                  strokeDasharray="8 10"
+                />
+
+                <path
+                  d="M100 195 L100 230 M150 174 L150 230 M200 154 L200 230 M250 133 L250 230 M300 112 L300 230"
+                  stroke="#B7C2CB"
+                  strokeWidth="2"
+                  strokeDasharray="4 5"
+                />
+
+                <g transform="translate(190 147) rotate(-22)">
+                  <rect
+                    x="-48"
+                    y="-28"
+                    width="96"
+                    height="36"
+                    rx="10"
+                    fill="#F2B66D"
+                    stroke="#D79B52"
+                    strokeWidth="2"
+                  />
+                  <rect
+                    x="-31"
+                    y="-22"
+                    width="24"
+                    height="19"
+                    rx="5"
+                    fill="#FFF4D9"
+                  />
+                  <rect
+                    x="7"
+                    y="-22"
+                    width="24"
+                    height="19"
+                    rx="5"
+                    fill="#FFF4D9"
+                  />
+                  <circle
+                    cx="-29"
+                    cy="12"
+                    r="11"
+                    fill="#526B7E"
+                    stroke="#F8FAFC"
+                    strokeWidth="3"
+                  />
+                  <circle
+                    cx="29"
+                    cy="12"
+                    r="11"
+                    fill="#526B7E"
+                    stroke="#F8FAFC"
+                    strokeWidth="3"
+                  />
+                </g>
+
+                <path
+                  d="M225 87 Q250 67 275 73"
+                  stroke="#5388C6"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <path
+                  d="M264 62 L277 73 L263 82"
+                  stroke="#5388C6"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+
+                <circle cx="90" cy="70" r="24" fill="#F6DCA8" />
+                <path
+                  d="M80 70 L100 70 M90 60 L90 80"
+                  stroke="#BA9554"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+
+                <text
+                  x="280"
+                  y="51"
+                  fontSize="14"
+                  fill="#477FBD"
+                  fontWeight="600"
+                >
+                  a = ?
+                </text>
+                <text
+                  x="54"
+                  y="258"
+                  fontSize="12"
+                  fill="#72879A"
+                >
+                  MOTION EXPERIMENT
+                </text>
+              </svg>
+
+              <div className="absolute bottom-4 right-4 rotate-3 rounded-xl bg-white px-4 py-3 shadow-md">
+                <p className="text-xs text-[#8A96A3]">探索问题</p>
+                <p className="mt-1 text-sm font-bold">小车为什么会加速？</p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-3 gap-3">
+              <div className="rounded-2xl bg-white p-3">
+                <p className="text-xl">📐</p>
+                <p className="mt-2 text-sm font-bold">公式</p>
+                <p className="mt-1 text-xs text-[#8B96A3]">理解关系</p>
+              </div>
+              <div className="rounded-2xl bg-white p-3">
+                <p className="text-xl">🔍</p>
+                <p className="mt-2 text-sm font-bold">观察</p>
+                <p className="mt-1 text-xs text-[#8B96A3]">发现规律</p>
+              </div>
+              <div className="rounded-2xl bg-white p-3">
+                <p className="text-xl">💡</p>
+                <p className="mt-2 text-sm font-bold">思考</p>
+                <p className="mt-1 text-xs text-[#8B96A3]">解决问题</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="absolute -left-4 top-24 hidden -rotate-6 rounded-2xl bg-white px-4 py-3 shadow-lg md:block">
+            <span className="text-xl">✦</span>
+            <span className="ml-2 text-sm font-bold">好奇心，是第一推动力</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 学习空间 */}
+      <section id="features" className="bg-white/70 px-6 py-16 md:px-10 md:py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
-              <h2 className="text-xl font-bold">我的错题本</h2>
-              <p className="mt-2 text-sm text-slate-500">
-                已记录 {wrongRecords.length} 道错题
+              <p className="text-xs font-bold tracking-[0.22em] text-[#7197BD]">
+                YOUR LEARNING SPACE
+              </p>
+              <h2 className="mt-3 text-3xl font-black md:text-4xl">
+                你的物理工具箱
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-[#8792A0] md:text-base">
+                每个工具都有自己的任务，组合起来就是完整的学习流程。
               </p>
             </div>
-
-            <button
-              onClick={() => setShowWrongBook(!showWrongBook)}
-              className="shrink-0 rounded-xl bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 hover:bg-blue-100"
-            >
-              {showWrongBook ? "收起错题本" : "查看错题"}
-            </button>
+            <span className="rounded-full bg-[#F5F0E4] px-4 py-2 text-sm text-[#9A865F]">
+              LEARN · PRACTICE · REFLECT
+            </span>
           </div>
 
-          {showWrongBook && (
-            <div className="mt-6 space-y-4">
-              {wrongRecords.length === 0 ? (
-                <p className="rounded-xl bg-slate-50 p-5 text-sm text-slate-500">
-                  暂时没有错题。完成练习并提交答案后，答错的题目会自动保存到这里。
-                </p>
-              ) : (
-                wrongRecords.map((record) => (
-                  <article
-                    key={record.question.question}
-                    className="rounded-xl border border-slate-200 p-4"
+          <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {features.map((feature) => {
+              const palettes: Record<
+                string,
+                { bg: string; icon: string; number: string }
+              > = {
+                blue: {
+                  bg: "bg-[#EAF2FB]",
+                  icon: "bg-[#D7E7F9]",
+                  number: "text-[#719AC8]",
+                },
+                orange: {
+                  bg: "bg-[#FBF0E2]",
+                  icon: "bg-[#F7DFC0]",
+                  number: "text-[#C79253]",
+                },
+                pink: {
+                  bg: "bg-[#F8EBE8]",
+                  icon: "bg-[#F2D8D1]",
+                  number: "text-[#C58D81]",
+                },
+                green: {
+                  bg: "bg-[#EAF1E6]",
+                  icon: "bg-[#D8E6CF]",
+                  number: "text-[#819C70]",
+                },
+              };
+
+              const palette = palettes[feature.color];
+
+              return (
+                <article
+                  key={feature.number}
+                  className="group rounded-[1.7rem] border border-[#EDEBE4] bg-[#FFFEFA] p-5 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#3B4B5C]/5"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={`text-xs font-bold ${palette.number}`}>
+                      {feature.number}
+                    </span>
+                    <span
+                      className={`flex h-12 w-12 items-center justify-center rounded-2xl text-2xl ${palette.icon}`}
+                    >
+                      {feature.icon}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-6 text-xl font-black">
+                    {feature.title}
+                  </h3>
+
+                  <p className="mt-3 min-h-[48px] text-sm leading-6 text-[#6F7D8D]">
+                    {feature.subtitle}
+                  </p>
+
+                  <div className={`mt-5 rounded-xl px-3 py-3 text-xs leading-5 ${palette.bg} text-[#68778A]`}>
+                    {feature.description}
+                  </div>
+
+                  <a
+                    href={feature.href}
+                    className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#4C78A6] transition group-hover:gap-3"
                   >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-red-50 px-3 py-1 text-xs text-red-600">
-                        {record.question.knowledgePoint}
-                      </span>
+                    {feature.button}
+                  </a>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-                      <span className="text-xs text-slate-400">
-                        错误次数：{record.wrongCount}
-                      </span>
-                    </div>
-
-                    <h3 className="mt-3 font-semibold leading-6">
-                      {record.question.question}
-                    </h3>
-
-                    <p className="mt-3 text-sm text-red-600">
-                      你的上次答案：{record.userAnswer}
-                    </p>
-
-                    <p className="mt-2 text-sm text-green-700">
-                      正确答案：{record.question.answer}
-                    </p>
-
-                    <p className="mt-3 text-sm leading-6 text-slate-600">
-                      {record.question.explanation}
-                    </p>
-
-                    <div className="mt-4 flex flex-wrap gap-3">
-                      <button
-                        onClick={() => reviewWrongQuestion(record)}
-                        className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-                      >
-                        重新练习
-                      </button>
-
-                      <button
-                        onClick={() =>
-                          removeWrongQuestion(
-                            record.question.question
-                          )
-                        }
-                        className="rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
-                      >
-                        已掌握，移出错题本
-                      </button>
-                    </div>
-                  </article>
-                ))
-              )}
+      {/* 实验工坊 */}
+      <section id="experiments" className="px-6 py-16 md:px-10 md:py-20">
+        <div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-[#E7EDF0] p-6 md:p-10">
+          <div className="grid items-center gap-10 md:grid-cols-[0.85fr_1.15fr]">
+            <div>
+              <p className="text-xs font-bold tracking-[0.22em] text-[#718C9F]">
+                EXPERIMENT WORKSHOP
+              </p>
+              <h2 className="mt-4 text-3xl font-black leading-tight md:text-4xl">
+                不只看公式，
+                <br />
+                也要看见运动。
+              </h2>
+              <p className="mt-5 max-w-md text-sm leading-7 text-[#6D7D89] md:text-base">
+                从观察小车的运动开始，把抽象的物理规律变成能够观察、操作和分析的实验。
+              </p>
+              <div className="mt-7 inline-flex rounded-xl border border-[#D2DDE3] bg-white/70 px-4 py-3 text-sm text-[#6F8797]">
+                🧪 互动实验功能正在规划中
+              </div>
             </div>
-          )}
-        </section>
 
-        <footer className="mt-8 pb-8 text-center text-xs leading-6 text-slate-400">
-          错题记录保存在当前浏览器中。
-          <br />
-          当前使用内置题库，尚未接入真正的 AI 自动出题与阅卷服务。
-        </footer>
-      </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {experiments.map((experiment, index) => (
+                <div
+                  key={experiment.title}
+                  className={`rounded-2xl p-5 ${
+                    index === 0
+                      ? "bg-[#F8E6C9]"
+                      : index === 1
+                        ? "bg-[#DCEAF8]"
+                        : "bg-[#E5EAD9]"
+                  }`}
+                >
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/70 text-3xl">
+                    {experiment.icon}
+                  </div>
+                  <h3 className="mt-5 font-black">{experiment.title}</h3>
+                  <p className="mt-2 text-xs leading-5 text-[#74808A]">
+                    {experiment.detail}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 学习路径 */}
+      <section className="px-6 pb-16 md:px-10 md:pb-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center">
+            <p className="text-xs font-bold tracking-[0.22em] text-[#7197BD]">
+              A LITTLE PROGRESS EVERY DAY
+            </p>
+            <h2 className="mt-3 text-3xl font-black">让学习形成闭环</h2>
+          </div>
+
+          <div className="mt-9 grid gap-4 md:grid-cols-4">
+            {[
+              { icon: "📄", title: "发现问题", text: "从试卷和练习中定位漏洞" },
+              { icon: "📚", title: "补充知识", text: "回到概念与公式重新理解" },
+              { icon: "✍️", title: "再次练习", text: "用新题检验自己的掌握情况" },
+              { icon: "📈", title: "复盘进步", text: "持续关注薄弱知识点的变化" },
+            ].map((step, index) => (
+              <div
+                key={step.title}
+                className="relative rounded-2xl border border-[#EAE8E0] bg-white p-5 text-center"
+              >
+                <span className="text-3xl">{step.icon}</span>
+                <p className="mt-3 font-black">{step.title}</p>
+                <p className="mt-2 text-xs leading-5 text-[#84909C]">
+                  {step.text}
+                </p>
+                {index < 3 && (
+                  <span className="absolute -right-3 top-1/2 z-10 hidden -translate-y-1/2 text-xl text-[#B6C1C9] md:block">
+                    →
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 页脚 */}
+      <footer id="about" className="border-t border-[#EAE7DE] px-6 py-8 md:px-10">
+        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 text-sm text-[#8993A0] md:flex-row md:items-center">
+          <div>
+            <p className="font-black text-[#536273]">⚛ 物理实验室</p>
+            <p className="mt-1 text-xs">
+              把问题变成线索，把理解变成能力。
+            </p>
+          </div>
+          <div className="text-xs leading-6 md:text-right">
+            <p>高中物理学习与实验探索平台</p>
+            <p>练习与错题记录保存在当前浏览器中。</p>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
