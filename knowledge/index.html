@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高一物理知识卡片</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "Microsoft YaHei", sans-serif;
+      background: #f3f6fb;
+      color: #172033;
+    }
+
+    .container {
+      width: min(760px, 92%);
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .back {
+      color: #315bd6;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .tag {
+      padding: 7px 12px;
+      border-radius: 20px;
+      background: #e3eaff;
+      color: #315bd6;
+      font-size: 13px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(26px, 5vw, 36px);
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      color: #64748b;
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      color: #64748b;
+      font-size: 13px;
+      margin-bottom: 9px;
+    }
+
+    .progress-track {
+      height: 6px;
+      border-radius: 10px;
+      background: #e1e7f0;
+      overflow: hidden;
+      margin-bottom: 22px;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0;
+      background: #4268e8;
+      transition: width 0.25s;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e5eaf2;
+      border-radius: 22px;
+      padding: clamp(22px, 5vw, 36px);
+      min-height: 390px;
+      box-shadow: 0 12px 35px rgba(35, 55, 90, 0.06);
+    }
+
+    .chapter {
+      color: #4268e8;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .card h2 {
+      font-size: clamp(25px, 5vw, 32px);
+      margin: 0 0 24px;
+    }
+
+    .label {
+      color: #64748b;
+      font-size: 12px;
+      margin: 22px 0 8px;
+    }
+
+    .content {
+      font-size: 16px;
+      line-height: 1.9;
+      white-space: pre-line;
+    }
+
+    .formula {
+      padding: 16px;
+      border-radius: 12px;
+      background: #f0f5ff;
+      color: #244cc2;
+      font-size: 19px;
+      font-weight: 600;
+      line-height: 1.8;
+    }
+
+    .warning {
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #fff7ed;
+      color: #9a4a0a;
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .example {
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #f0fdf4;
+      color: #166534;
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .prev {
+      background: white;
+      color: #334155;
+      border: 1px solid #dbe2ed;
+    }
+
+    .next {
+      flex: 1;
+      background: #315bd6;
+      color: white;
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .tip {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding-top: 20px;
+      }
+
+      .card {
+        min-height: 350px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <div class="top">
+      <a class="back" href="../practice.html">← 返回物理练习</a>
+      <span class="tag">高一物理 · 必修第一册</span>
+    </div>
+
+    <h1>物理知识卡片</h1>
+    <div class="subtitle">
+      一次掌握一个知识点。理解概念、记住规律、避开易错点。
+    </div>
+
+    <div class="progress-info">
+      <span id="topicName">运动的描述</span>
+      <span id="counter">1 / 12</span>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <section class="card">
+      <div class="chapter" id="chapter"></div>
+      <h2 id="title"></h2>
+
+      <div class="label">核心理解</div>
+      <div class="content" id="definition"></div>
+
+      <div class="label">关键公式 / 结论</div>
+      <div class="formula" id="formula"></div>
+
+      <div class="label">典型例子</div>
+      <div class="example" id="example"></div>
+
+      <div class="label">易错提醒</div>
+      <div class="warning" id="warning"></div>
+    </section>
+
+    <div class="controls">
+      <button class="prev" id="prevBtn" onclick="changeCard(-1)">
+        ← 上一张
+      </button>
+
+      <button class="next" id="nextBtn" onclick="changeCard(1)">
+        下一张 →
+      </button>
+    </div>
+
+    <div class="tip">
+      建议：先尝试自己说出结论，再阅读卡片内容。
+    </div>
+
+  </main>
+
+  <script>
+    const cards = [
+      {
+        chapter: "第一章 · 运动的描述",
+        topic: "运动的描述",
+        title: "01 质点",
+        definition: "当物体的大小和形状对所研究的问题影响很小时，可以忽略它们，把物体看成一个具有质量的点。",
+        formula: "质点是一种理想化模型",
+        example: "研究地球绕太阳公转时，可以把地球看成质点。",
+        warning: "物体能否看成质点，取决于研究问题，而不是只看物体本身有多大。"
+      },
+      {
+        chapter: "第一章 · 运动的描述",
+        topic: "运动的描述",
+        title: "02 参考系",
+        definition: "描述物体运动时，选来作为标准的另一个物体，叫作参考系。",
+        formula: "运动和静止具有相对性",
+        example: "坐在行驶的汽车里，乘客相对汽车静止，相对路边树木运动。",
+        warning: "判断运动还是静止，必须先明确参考系。"
+      },
+      {
+        chapter: "第一章 · 运动的描述",
+        topic: "运动的描述",
+        title: "03 时间与时刻",
+        definition: "时刻表示某一瞬间；时间间隔表示两个时刻之间经过的时间。",
+        formula: "时间间隔 = 末时刻 − 初时刻",
+        example: "第 3 秒末是一个时刻；第 3 秒内是一个时间间隔。",
+        warning: "“第几秒末”通常指时刻；“几秒内”通常指时间间隔。"
+      },
+      {
+        chapter: "第一章 · 运动的描述",
+        topic: "运动的描述",
+        title: "04 路程与位移",
+        definition: "路程是运动轨迹的长度；位移是从初位置指向末位置的有向线段。",
+        formula: "路程 ≥ 位移大小",
+        example: "绕操场一圈回到起点：路程不为零，位移为零。",
+        warning: "路程是标量；位移是矢量。不要把两者混为一谈。"
+      },
+      {
+        chapter: "第一章 · 运动的描述",
+        topic: "运动的描述",
+        title: "05 速度",
+        definition: "速度描述物体位置变化的快慢和方向。",
+        formula: "平均速度 = 位移 ÷ 时间间隔",
+        example: "物体 10 秒内向东位移 20 米，平均速度为向东 2 米/秒。",
+        warning: "平均速度使用位移计算，不是用路程计算。"
+      },
+      {
+        chapter: "第一章 · 运动的描述",
+        topic: "运动的描述",
+        title: "06 瞬时速度",
+        definition: "瞬时速度表示物体在某一时刻或某一位置的运动快慢和方向。",
+        formula: "平均速度在时间间隔趋近于零时，对应瞬时速度",
+        example: "汽车速度表在某一瞬间显示的读数，反映瞬时速率。",
+        warning: "速率只有大小；速度既有大小，也有方向。"
+      },
+      {
+        chapter: "第一章 · 运动的描述",
+        topic: "运动的描述",
+        title: "07 加速度",
+        definition: "加速度描述速度变化的快慢，是速度变化量与所用时间的比值。",
+        formula: "a = Δv / Δt",
+        example: "速度在 2 秒内从 2 米/秒变为 8 米/秒，加速度为 3 米/秒²。",
+        warning: "加速度不等于速度。速度大，不代表加速度一定大。"
+      },
+      {
+        chapter: "第二章 · 匀变速直线运动",
+        topic: "匀变速直线运动",
+        title: "08 匀变速直线运动",
+        definition: "沿直线运动，且加速度保持不变的运动。",
+        formula: "v = v₀ + at",
+        example: "物体以 2 米/秒的初速度沿直线运动，加速度为 3 米/秒²，2 秒末速度为 8 米/秒。",
+        warning: "公式中各物理量的方向要统一用正负号表示。"
+      },
+      {
+        chapter: "第二章 · 匀变速直线运动",
+        topic: "匀变速直线运动",
+        title: "09 位移公式",
+        definition: "匀变速直线运动中，位移可以由初速度、加速度和时间求出。",
+        formula: "x = v₀t + ½at²",
+        example: "初速度为 0，加速度为 2 米/秒²，经过 3 秒，位移为 9 米。",
+        warning: "该公式要求物体做匀变速直线运动，并注意位移正负。"
+      },
+      {
+        chapter: "第二章 · 匀变速直线运动",
+        topic: "匀变速直线运动",
+        title: "10 速度—位移关系",
+        definition: "当题目没有直接给出时间时，可以利用速度、加速度和位移之间的关系。",
+        formula: "v² − v₀² = 2ax",
+        example: "已知初速度、末速度和加速度，可以求位移，不必先求时间。",
+        warning: "不要漏掉平方，也要注意加速度和位移的正负号。"
+      },
+      {
+        chapter: "第三章 · 相互作用",
+        topic: "相互作用",
+        title: "11 重力与弹力",
+        definition: "重力是地球对物体的吸引作用；弹力是发生弹性形变的物体对接触物体的作用。",
+        formula: "重力大小：G = mg",
+        example: "物体静止放在水平桌面上，通常受到重力和桌面的支持力。",
+        warning: "重力方向竖直向下；支持力通常垂直接触面。"
+      },
+      {
+        chapter: "第三章 · 相互作用",
+        topic: "相互作用",
+        title: "12 摩擦力",
+        definition: "摩擦力沿接触面，阻碍物体间的相对运动或相对运动趋势。",
+        formula: "滑动摩擦力：f = μN",
+        example: "物体在粗糙水平面上向右滑动时，滑动摩擦力通常向左。",
+        warning: "摩擦力不一定与物体运动方向相反，要判断它阻碍的是相对运动还是相对运动趋势。"
+      }
+    ];
+
+    let current = 0;
+
+    function renderCard() {
+      const card = cards[current];
+
+      document.getElementById("chapter").textContent = card.chapter;
+      document.getElementById("title").textContent = card.title;
+      document.getElementById("definition").textContent = card.definition;
+      document.getElementById("formula").textContent = card.formula;
+      document.getElementById("example").textContent = card.example;
+      document.getElementById("warning").textContent = card.warning;
+      document.getElementById("topicName").textContent = card.topic;
+      document.getElementById("counter").textContent =
+        `${current + 1} / ${cards.length}`;
+
+      document.getElementById("progress").style.width =
+        `${((current + 1) / cards.length) * 100}%`;
+
+      document.getElementById("prevBtn").disabled = current === 0;
+      document.getElementById("nextBtn").textContent =
+        current === cards.length - 1 ? "重新浏览 ↻" : "下一张 →";
+    }
+
+    function changeCard(direction) {
+      if (current === cards.length - 1 && direction === 1) {
+        current = 0;
+      } else {
+        current = Math.max(
+          0,
+          Math.min(cards.length - 1, current + direction)
+        );
+      }
+
+      renderCard();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "ArrowLeft") changeCard(-1);
+      if (event.key === "ArrowRight") changeCard(1);
+    });
+
+    renderCard();
+  </script>
+</body>
+</html>
