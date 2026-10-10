@@ -99,7 +99,7 @@ export default function HomePage() {
         <div className="hidden items-center gap-6 text-sm text-gray-500 sm:flex">
           <span>智能错题分析</span>
           <span>知识点诊断</span>
-          <a href="/practice" className="hover:text-blue-600">
+          <a href="/physics-exam-analyzer/practice" className="hover:text-blue-600">
             举一反三
           </a>
         </div>
