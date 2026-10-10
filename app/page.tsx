@@ -79,7 +79,7 @@ export default function HomePage() {
           <span>智能错题分析</span>
           <span>知识点诊断</span>
           <a
-            href="/physics-exam-analyzer/practice/"
+          href="/physics-exam-analyzer/practice.html"
             className="hover:text-blue-600"
           >
             举一反三
