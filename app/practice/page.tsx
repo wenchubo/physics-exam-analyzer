@@ -560,6 +560,127 @@ export default function PracticePage() {
     导出 Word 错题本
   </button>
 </div>
+          {/* 物理学习诊断面板 */}
+<div style={{ ...cardStyle, marginBottom: "20px" }}>
+  <h2 style={{ fontSize: "22px", marginBottom: "16px" }}>
+    📊 物理学习诊断
+  </h2>
+
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+      gap: "12px",
+    }}
+  >
+    <div
+      style={{
+        padding: "16px",
+        borderRadius: "12px",
+        background: "#eff6ff",
+      }}
+    >
+      <p style={{ color: "#64748b", margin: 0 }}>错题数量</p>
+      <strong style={{ fontSize: "28px", color: "#1d4ed8" }}>
+        {wrongQuestions.length}
+      </strong>
+      <p style={{ margin: 0, color: "#64748b", fontSize: "13px" }}>
+        道
+      </p>
+    </div>
+
+    <div
+      style={{
+        padding: "16px",
+        borderRadius: "12px",
+        background: "#fff7ed",
+      }}
+    >
+      <p style={{ color: "#64748b", margin: 0 }}>累计错误次数</p>
+      <strong style={{ fontSize: "28px", color: "#c2410c" }}>
+        {wrongQuestions.reduce(
+          (total, q) => total + wrongRecords[q.id].count,
+          0
+        )}
+      </strong>
+      <p style={{ margin: 0, color: "#64748b", fontSize: "13px" }}>
+        次
+      </p>
+    </div>
+  </div>
+
+  <h3 style={{ fontSize: "17px", marginTop: "22px" }}>
+    🔍 薄弱知识点排行
+  </h3>
+
+  {Object.entries(
+    wrongQuestions.reduce((result, q) => {
+      result[q.topic] = (result[q.topic] || 0) + wrongRecords[q.id].count;
+      return result;
+    }, {} as Record<string, number>)
+  )
+    .sort((a, b) => b[1] - a[1])
+    .map(([topic, count]) => (
+      <div
+        key={topic}
+        style={{
+          marginTop: "12px",
+          padding: "12px",
+          borderRadius: "10px",
+          background: "#f8fafc",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "12px",
+          }}
+        >
+          <span>{topic}</span>
+          <strong>{count} 次错误</strong>
+        </div>
+
+        <div
+          style={{
+            height: "8px",
+            marginTop: "8px",
+            borderRadius: "8px",
+            background: "#e2e8f0",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              width: `${
+                (count /
+                  Math.max(
+                    ...Object.values(
+                      wrongQuestions.reduce((result, q) => {
+                        result[q.topic] =
+                          (result[q.topic] || 0) +
+                          wrongRecords[q.id].count;
+                        return result;
+                      }, {} as Record<string, number>)
+                    )
+                  )) *
+                100
+              }%`,
+              background: "#f97316",
+              borderRadius: "8px",
+            }}
+          />
+        </div>
+      </div>
+    ))}
+
+  {wrongQuestions.length === 0 && (
+    <p style={{ color: "#64748b", marginTop: "12px" }}>
+      暂无错题记录。完成几道练习题后，这里就会显示你的薄弱知识点。
+    </p>
+  )}
+</div>
           {wrongQuestions.length === 0 ? (
             <div style={cardStyle}>
               <p>错题本还是空的。</p>
