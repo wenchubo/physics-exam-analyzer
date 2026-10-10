@@ -71,7 +71,7 @@ export default function HomePage() {
       }
 
       sessionStorage.setItem("physics-analysis", JSON.stringify(data));
-      window.location.href = "/report";
+   window.location.href = "/physics-exam-analyzer/report";
     } catch (error) {
       setMessage(
         error instanceof Error
