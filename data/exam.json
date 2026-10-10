@@ -1,0 +1,246 @@
+{
+  "examId": "beihua-fuzhong-physics-2026-10",
+  "title": "北化附中高一物理10月月考",
+  "subject": "物理",
+  "grade": "高一",
+  "status": "initial",
+  "questions": [
+    {
+      "id": 1,
+      "type": "single_choice",
+      "answer": "C",
+      "knowledgePoints": ["矢量与标量"],
+      "status": "answer_recorded"
+    },
+    {
+      "id": 2,
+      "type": "single_choice",
+      "answer": "C",
+      "knowledgePoints": ["匀变速直线运动"],
+      "status": "answer_recorded"
+    },
+    {
+      "id": 3,
+      "type": "single_choice",
+      "answer": "D",
+      "knowledgePoints": ["速度变化量", "矢量"],
+      "status": "image_missing"
+    },
+    {
+      "id": 4,
+      "type": "single_choice",
+      "answer": "C",
+      "knowledgePoints": ["速度", "加速度"],
+      "status": "answer_recorded"
+    },
+    {
+      "id": 5,
+      "type": "single_choice",
+      "answer": "C",
+      "knowledgePoints": ["质点", "位移与路程", "加速度"],
+      "status": "answer_recorded"
+    },
+    {
+      "id": 6,
+      "type": "single_choice",
+      "answer": "D",
+      "knowledgePoints": ["参考系", "相对运动"],
+      "status": "answer_recorded"
+    },
+    {
+      "id": 7,
+      "type": "single_choice",
+      "answer": "A",
+      "knowledgePoints": ["平均速度", "路程与位移"],
+      "status": "answer_recorded"
+    },
+    {
+      "id": 8,
+      "type": "single_choice",
+      "answer": "A",
+      "knowledgePoints": ["平均加速度"],
+      "status": "answer_needs_review"
+    },
+    {
+      "id": 9,
+      "type": "single_choice",
+      "answer": "C",
+      "knowledgePoints": ["竖直上抛运动", "速度时间图像"],
+      "status": "image_missing"
+    },
+    {
+      "id": 10,
+      "type": "single_choice",
+      "answer": "D",
+      "knowledgePoints": ["位移时间图像"],
+      "status": "image_missing"
+    },
+    {
+      "id": 11,
+      "type": "single_choice",
+      "answer": "D",
+      "knowledgePoints": ["速度时间图像"],
+      "status": "image_missing"
+    },
+    {
+      "id": 12,
+      "type": "single_choice",
+      "answer": "A",
+      "knowledgePoints": ["速度时间图像", "火箭运动"],
+      "status": "image_missing"
+    },
+    {
+      "id": 13,
+      "type": "single_choice",
+      "answer": "C",
+      "knowledgePoints": ["速度时间图像", "运动比较"],
+      "status": "image_missing"
+    },
+    {
+      "id": 14,
+      "type": "single_choice",
+      "answer": "D",
+      "knowledgePoints": ["位移时间图像", "追及问题"],
+      "status": "image_missing"
+    },
+    {
+      "id": 15,
+      "type": "single_choice",
+      "answer": "C",
+      "knowledgePoints": ["运动图像"],
+      "status": "image_missing"
+    },
+    {
+      "id": 16,
+      "type": "single_choice",
+      "answer": "B",
+      "knowledgePoints": ["匀变速直线运动", "分段运动"],
+      "status": "answer_needs_review"
+    },
+    {
+      "id": 17,
+      "type": "single_choice",
+      "answer": "D",
+      "knowledgePoints": ["加速度时间图像", "速度时间图像"],
+      "status": "image_missing"
+    },
+    {
+      "id": 18,
+      "type": "single_choice",
+      "answer": "B",
+      "knowledgePoints": ["位移时间图像"],
+      "status": "image_missing"
+    },
+    {
+      "id": 19,
+      "type": "single_choice",
+      "answer": "D",
+      "knowledgePoints": ["急动度"],
+      "status": "image_missing"
+    },
+    {
+      "id": 20,
+      "type": "multiple_choice",
+      "answer": ["C", "D"],
+      "knowledgePoints": ["位移时间图像"],
+      "status": "image_missing"
+    },
+    {
+      "id": 21,
+      "type": "multiple_choice",
+      "answer": ["B", "C", "D"],
+      "knowledgePoints": ["速度", "平均速度", "速率"],
+      "status": "answer_needs_review"
+    },
+    {
+      "id": 22,
+      "type": "multiple_choice",
+      "answer": ["B", "D"],
+      "knowledgePoints": ["自由落体运动", "反弹运动"],
+      "status": "image_missing"
+    },
+    {
+      "id": 23,
+      "type": "multiple_choice",
+      "answer": ["B", "C"],
+      "knowledgePoints": ["运动图像", "相对运动"],
+      "status": "image_missing"
+    },
+    {
+      "id": 24,
+      "type": "multiple_choice",
+      "answer": ["A", "D"],
+      "knowledgePoints": ["位移时间图像"],
+      "status": "image_missing"
+    },
+    {
+      "id": 25,
+      "type": "experiment",
+      "answer": null,
+      "knowledgePoints": ["打点计时器", "纸带分析", "平均速度"],
+      "status": "incomplete"
+    },
+    {
+      "id": 26,
+      "type": "experiment",
+      "answer": {
+        "velocityA": "1.0 m/s",
+        "velocityB": "2.0 m/s",
+        "acceleration": "2.0 m/s²"
+      },
+      "knowledgePoints": ["光电门", "瞬时速度", "加速度"],
+      "status": "answer_recorded"
+    },
+    {
+      "id": 27,
+      "type": "experiment",
+      "answer": null,
+      "knowledgePoints": ["纸带分析", "匀加速直线运动"],
+      "status": "incomplete"
+    },
+    {
+      "id": 28,
+      "type": "calculation",
+      "answer": {
+        "accelerationMagnitude": "2 m/s²",
+        "timeFor9mAfterBraking": "1 s",
+        "distanceWithin8sAfterBraking": "25 m"
+      },
+      "knowledgePoints": ["刹车问题", "匀变速直线运动"],
+      "status": "answer_recorded"
+    },
+    {
+      "id": 29,
+      "type": "calculation",
+      "answer": null,
+      "knowledgePoints": ["加速度", "运动学公式"],
+      "status": "incomplete"
+    },
+    {
+      "id": 30,
+      "type": "calculation",
+      "answer": {
+        "maximumDistance": "16 m",
+        "timeAtMaximumDistance": "3 s",
+        "meetingTime": "7 s",
+        "meetingPosition": "28 m",
+        "vehicleBVelocityAtMeeting": "-4 m/s"
+      },
+      "knowledgePoints": ["追及问题", "匀速直线运动", "匀变速直线运动"],
+      "status": "answer_needs_review"
+    },
+    {
+      "id": 31,
+      "type": "calculation",
+      "answer": {
+        "maximumDistance": "25 m",
+        "timeAtMaximumDistance": "10 s",
+        "meetingTime": "20 s",
+        "meetingPosition": "100 m",
+        "carVelocityAtMeeting": "10 m/s"
+      },
+      "knowledgePoints": ["追及问题", "匀加速直线运动", "匀速直线运动"],
+      "status": "answer_needs_review"
+    }
+  ]
+}
