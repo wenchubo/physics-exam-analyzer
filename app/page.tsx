@@ -86,7 +86,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#fafbfc] text-[#172033]">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <a href="/" className="flex items-center gap-3">
+        <a href="/physics-exam-analyzer/" className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
             <BrainCircuit size={23} />
           </div>
