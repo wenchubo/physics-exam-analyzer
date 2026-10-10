@@ -65,7 +65,7 @@ const questions: Question[] = [
     topic: "匀变速直线运动",
     question: "物体做匀加速直线运动，初速度为 2 m/s，加速度为 3 m/s²，3 s 末速度为多少？",
     options: ["5 m/s", "8 m/s", "9 m/s", "11 m/s"],
-    answer: 1,
+    answer: 3,
     explanation:
       "根据 v = v₀ + at，代入 v = 2 + 3 × 3 = 11 m/s。注意正确答案应为 11 m/s。",
   },
