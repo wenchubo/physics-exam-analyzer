@@ -10,7 +10,107 @@ type Question = {
   answer: number;
   explanation: string;
 };
+function exportWrongQuestionsToWord(
+  questions: Question[],
+  wrongRecords: Record<number, { count: number }>
+) {
+  if (questions.length === 0) {
+    alert("错题本为空，暂时没有可导出的题目。");
+    return;
+  }
 
+  const escapeHtml = (value: unknown) =>
+    String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+
+  const content = questions
+    .map((q, index) => {
+      const options = q.options
+        .map(
+          (option, optionIndex) =>
+            `<p>${String.fromCharCode(65 + optionIndex)}. ${escapeHtml(option)}</p>`
+        )
+        .join("");
+
+      return `
+        <div class="question">
+          <h2>${index + 1}. ${escapeHtml(q.question)}</h2>
+          <p class="topic">知识点：${escapeHtml(q.topic)}</p>
+          ${options}
+          <p class="answer">正确答案：${String.fromCharCode(65 + q.answer)}. ${escapeHtml(q.options[q.answer])}</p>
+          <p>解析：${escapeHtml(q.explanation)}</p>
+          <p class="count">错误次数：${wrongRecords[q.id]?.count ?? 0}</p>
+        </div>
+      `;
+    })
+    .join("");
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>高中物理错题本</title>
+      <style>
+        body {
+          font-family: "Microsoft YaHei", sans-serif;
+          line-height: 1.8;
+          color: #222;
+          margin: 36px;
+        }
+        h1 {
+          text-align: center;
+          margin-bottom: 30px;
+        }
+        h2 {
+          font-size: 16pt;
+          color: #1d4ed8;
+        }
+        .question {
+          margin-bottom: 28px;
+          padding-bottom: 18px;
+          border-bottom: 1px solid #bbb;
+        }
+        .topic, .count {
+          color: #64748b;
+          font-size: 10pt;
+        }
+        .answer {
+          font-weight: bold;
+          color: #166534;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>高中物理错题本</h1>
+      <p>导出题数：${questions.length}</p>
+      ${content}
+    </body>
+    </html>
+  `;
+
+  const blob = new Blob(["\ufeff", html], {
+    type: "application/msword;charset=utf-8",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = `高中物理错题本_${new Date()
+    .toLocaleDateString("zh-CN")
+    .replace(/\//g, "-")}.doc`;
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  URL.revokeObjectURL(url);
+}
 type WrongRecord = {
   id: number;
   count: number;
@@ -446,7 +546,20 @@ export default function PracticePage() {
           <p style={{ color: "#64748b" }}>
             答错或未作答的题目会自动记录。记录保存在当前浏览器中。
           </p>
-
+<div style={{ margin: "16px 0" }}>
+  <button
+    style={{
+      ...buttonStyle,
+      background: "#2563eb",
+      color: "#fff",
+    }}
+    onClick={() =>
+      exportWrongQuestionsToWord(wrongQuestions, wrongRecords)
+    }
+  >
+    导出 Word 错题本
+  </button>
+</div>
           {wrongQuestions.length === 0 ? (
             <div style={cardStyle}>
               <p>错题本还是空的。</p>
