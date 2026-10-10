@@ -1,316 +1,206 @@
 "use client";
 
 import { useState } from "react";
-import {
-  ArrowLeft,
-  Sparkles,
-  BookOpen,
-  LoaderCircle,
-  ChevronDown,
-  ChevronUp,
-  Target,
-} from "lucide-react";
 
-type PracticeQuestion = {
-  number: number;
-  type: string;
-  question: string;
-  answer: string;
-  explanation: string;
-  knowledgePoint: string;
-};
+const bank = [
+  {
+    question: "关于质点，下列说法正确的是？",
+    options: ["A. 任何物体都能看作质点", "B. 研究地球公转时，地球可以看作质点", "C. 质点没有质量", "D. 质点是不存在的物体"],
+    answer: "B",
+    explanation: "当物体的大小和形状对研究问题的影响可以忽略时，可以将物体看作质点。",
+    knowledgePoint: "质点"
+  },
+  {
+    question: "下列物理量中，属于矢量的是？",
+    options: ["A. 时间", "B. 路程", "C. 位移", "D. 速率"],
+    answer: "C",
+    explanation: "位移既有大小，又有方向，是矢量；时间、路程和速率是标量。",
+    knowledgePoint: "位移"
+  },
+  {
+    question: "某物体在 4 s 内由静止加速到 12 m/s，其平均加速度是多少？",
+    options: ["A. 2 m/s²", "B. 3 m/s²", "C. 4 m/s²", "D. 48 m/s²"],
+    answer: "B",
+    explanation: "a=(v-v₀)/t=(12-0)/4=3 m/s²。",
+    knowledgePoint: "加速度"
+  },
+  {
+    question: "关于速度和加速度，下列说法正确的是？",
+    options: ["A. 速度越大，加速度一定越大", "B. 速度变化越大，加速度一定越大", "C. 加速度描述速度变化的快慢", "D. 加速度为零，速度一定为零"],
+    answer: "C",
+    explanation: "加速度描述速度变化的快慢。速度大不代表加速度大，加速度为零时速度可以不为零。",
+    knowledgePoint: "加速度"
+  },
+  {
+    question: "物体做匀变速直线运动，初速度为 2 m/s，加速度为 3 m/s²，3 s 末速度是多少？",
+    options: ["A. 5 m/s", "B. 8 m/s", "C. 9 m/s", "D. 11 m/s"],
+    answer: "D",
+    explanation: "由 v=v₀+at，得 v=2+3×3=11 m/s。",
+    knowledgePoint: "匀变速直线运动"
+  },
+  {
+    question: "自由落体运动的物体，在不计空气阻力时，其加速度如何？",
+    options: ["A. 越来越大", "B. 越来越小", "C. 始终为零", "D. 始终为重力加速度 g"],
+    answer: "D",
+    explanation: "自由落体运动只受重力作用，加速度始终为重力加速度 g。",
+    knowledgePoint: "自由落体"
+  },
+  {
+    question: "一物体受到两个同一直线、同方向的力，大小分别为 3 N 和 5 N，合力大小是多少？",
+    options: ["A. 2 N", "B. 3 N", "C. 5 N", "D. 8 N"],
+    answer: "D",
+    explanation: "同一直线上同方向的两个力，合力大小等于二力之和：3+5=8 N。",
+    knowledgePoint: "力的合成"
+  },
+  {
+    question: "关于弹力，下列说法正确的是？",
+    options: ["A. 只有弹簧才能产生弹力", "B. 相互接触的物体之间一定有弹力", "C. 弹力是物体发生弹性形变时产生的相互作用", "D. 弹力方向总是竖直向下"],
+    answer: "C",
+    explanation: "弹力与物体间的弹性形变有关，方向与形变情况及接触方式有关。",
+    knowledgePoint: "弹力"
+  },
+  {
+    question: "物体做匀速直线运动时，其加速度是多少？",
+    options: ["A. 0", "B. 1 m/s²", "C. 与速度相等", "D. 不一定"],
+    answer: "A",
+    explanation: "匀速直线运动的速度大小和方向均不变，因此加速度为零。",
+    knowledgePoint: "匀速直线运动"
+  },
+  {
+    question: "一物体从静止开始做匀加速直线运动，加速度为 2 m/s²，2 s 内位移是多少？",
+    options: ["A. 2 m", "B. 4 m", "C. 6 m", "D. 8 m"],
+    answer: "B",
+    explanation: "由 x=v₀t+½at²，得 x=0+½×2×2²=4 m。",
+    knowledgePoint: "位移公式"
+  }
+];
 
 export default function PracticePage() {
-  const [knowledgePoints, setKnowledgePoints] = useState("");
-  const [count, setCount] = useState("10");
-  const [customCount, setCustomCount] = useState("15");
-  const [difficulty, setDifficulty] = useState("接近原试卷");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [questions, setQuestions] = useState<PracticeQuestion[]>([]);
-  const [showAnswers, setShowAnswers] = useState<Record<number, boolean>>(
-    {}
-  );
+  const [topic, setTopic] = useState("");
+  const [count, setCount] = useState("5");
+  const [questions, setQuestions] = useState<typeof bank>([]);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [showAnswers, setShowAnswers] = useState(false);
+  const [message, setMessage] = useState("");
 
-  async function generateQuestions() {
-    const actualCount = count === "custom" ? Number(customCount) : Number(count);
+  function generateQuestions() {
+    const keywords = topic.trim().toLowerCase().split(/[，,、\s]+/).filter(Boolean);
 
-    if (!Number.isInteger(actualCount) || actualCount < 1 || actualCount > 50) {
-      setError("题目数量必须是 1 到 50 之间的整数。");
+    const matched = bank.filter((q) =>
+      keywords.length === 0 ||
+      keywords.some((word) =>
+        (q.knowledgePoint + q.question + q.explanation).toLowerCase().includes(word)
+      )
+    );
+
+    if (matched.length === 0) {
+      setQuestions([]);
+      setMessage("暂时没有匹配的题目。试试输入“加速度”“位移”或“弹力”，也可以清空知识点查看全部题目。");
       return;
     }
 
-    setLoading(true);
-    setError("");
-    setQuestions([]);
-    setShowAnswers({});
-
-    try {
-      const response = await fetch("/api/practice", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          count: actualCount,
-          knowledgePoints: knowledgePoints.trim(),
-          difficulty,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "生成练习题失败，请稍后重试。");
-      }
-
-      if (!Array.isArray(data.questions)) {
-        throw new Error("返回的数据格式不正确，请稍后重试。");
-      }
-
-      setQuestions(data.questions);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "发生未知错误，请稍后重试。"
-      );
-    } finally {
-      setLoading(false);
-    }
+    const amount = Math.min(Number(count), matched.length);
+    setQuestions(matched.slice(0, amount));
+    setAnswers({});
+    setShowAnswers(false);
+    setMessage(`已生成 ${amount} 道练习题。当前使用内置题库，尚未接入 AI。`);
   }
 
   return (
-    <main className="min-h-screen bg-[#fafbfc] text-[#172033]">
-      <header className="border-b border-gray-100 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
-          <a href="/" className="text-sm text-gray-500 hover:text-blue-600">
-            <ArrowLeft className="mr-2 inline" size={17} />
-            返回首页
-          </a>
+    <main className="min-h-screen bg-slate-50 px-5 py-8 text-slate-800">
+      <div className="mx-auto max-w-3xl">
+        <a href="/physics-exam-analyzer/" className="text-blue-600">
+          ← 返回首页
+        </a>
 
-          <span className="font-bold">物理 AI 智批</span>
-        </div>
-      </header>
+        <h1 className="mt-8 text-3xl font-bold">高中物理个性化练习</h1>
+        <p className="mt-3 text-slate-500">
+          选择知识点，生成练习题，提交答案后查看解析。
+        </p>
 
-      <section className="mx-auto max-w-4xl px-6 py-10 sm:py-14">
-        <div className="mb-8">
-          <div className="mb-3 flex items-center gap-2 text-sm text-blue-600">
-            <Sparkles size={18} />
-            个性化练习
-          </div>
-
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            把不会的知识点，
-            <br />
-            <span className="text-blue-600">练到真正掌握。</span>
-          </h1>
-
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-500 sm:text-base">
-            选择知识点和练习数量，生成对应的高中物理练习题。每道题都附有参考答案和解析。
-          </p>
-        </div>
-
-        <section className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
-          <label className="mb-3 block font-semibold">
-            <Target className="mr-2 inline text-blue-600" size={19} />
-            想练习哪些知识点？
-          </label>
-
-          <textarea
-            value={knowledgePoints}
-            onChange={(event) => setKnowledgePoints(event.target.value)}
-            placeholder="例如：加速度、匀变速直线运动、速度—时间图像。也可以留空。"
-            className="min-h-28 w-full resize-y rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm outline-none transition focus:border-blue-400 focus:bg-white"
+        <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+          <label className="block font-semibold">练习知识点</label>
+          <input
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="例如：加速度、位移、弹力；留空表示全部"
+            className="mt-3 w-full rounded-xl border p-3"
           />
 
-          <div className="mt-7">
-            <label className="mb-3 block font-semibold">
-              <BookOpen className="mr-2 inline text-blue-600" size={19} />
-              你想做多少道题？
-            </label>
-
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
-              {["5", "10", "20", "30", "custom"].map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setCount(value)}
-                  className={`rounded-xl border px-3 py-3 text-sm font-medium transition ${
-                    count === value
-                      ? "border-blue-600 bg-blue-50 text-blue-700"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-blue-300"
-                  }`}
-                >
-                  {value === "custom" ? "自定义" : `${value} 道`}
-                </button>
-              ))}
-            </div>
-
-            {count === "custom" && (
-              <div className="mt-4">
-                <label
-                  htmlFor="custom-count"
-                  className="mb-2 block text-sm text-gray-600"
-                >
-                  输入题目数量（1—50）
-                </label>
-
-                <input
-                  id="custom-count"
-                  type="number"
-                  min="1"
-                  max="50"
-                  value={customCount}
-                  onChange={(event) => setCustomCount(event.target.value)}
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-blue-400"
-                />
-              </div>
-            )}
-          </div>
-
-          <div className="mt-7">
-            <label
-              htmlFor="difficulty"
-              className="mb-3 block font-semibold"
-            >
-              练习难度
-            </label>
-
-            <div className="relative">
-              <select
-                id="difficulty"
-                value={difficulty}
-                onChange={(event) => setDifficulty(event.target.value)}
-                className="w-full appearance-none rounded-xl border border-gray-200 bg-white px-4 py-3 pr-10 text-sm outline-none focus:border-blue-400"
-              >
-                <option>基础巩固</option>
-                <option>接近原试卷</option>
-                <option>综合提升</option>
-              </select>
-
-              <ChevronDown
-                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
-                size={18}
-              />
-            </div>
-
-            <p className="mt-2 text-xs leading-5 text-gray-400">
-              难度由 AI 根据要求生成，实际难度仍需结合题目核对；接入完整原卷题库后，才能更可靠地对齐试卷难度。
-            </p>
-          </div>
+          <label className="mt-5 block font-semibold">题目数量</label>
+          <select
+            value={count}
+            onChange={(e) => setCount(e.target.value)}
+            className="mt-3 w-full rounded-xl border bg-white p-3"
+          >
+            <option value="5">5 道</option>
+            <option value="10">10 道</option>
+          </select>
 
           <button
-            type="button"
             onClick={generateQuestions}
-            disabled={loading}
-            className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-4 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+            className="mt-6 w-full rounded-xl bg-blue-600 p-4 font-semibold text-white hover:bg-blue-700"
           >
-            {loading ? (
-              <>
-                <LoaderCircle className="animate-spin" size={19} />
-                正在生成练习题……
-              </>
-            ) : (
-              <>
-                <Sparkles size={19} />
-                生成我的练习题
-              </>
-            )}
+            生成练习题
           </button>
 
-          {error && (
-            <p className="mt-4 rounded-xl bg-red-50 p-4 text-sm leading-6 text-red-600">
-              {error}
-            </p>
-          )}
+          {message && <p className="mt-4 text-sm text-slate-500">{message}</p>}
         </section>
 
         {questions.length > 0 && (
-          <section className="mt-10">
-            <div className="mb-5 flex items-center justify-between gap-3">
-              <h2 className="text-2xl font-bold">本次练习</h2>
-              <span className="text-sm text-gray-500">
-                共 {questions.length} 道题
-              </span>
-            </div>
+          <section className="mt-8 space-y-5">
+            {questions.map((q, i) => (
+              <article key={i} className="rounded-2xl bg-white p-6 shadow-sm">
+                <p className="text-sm text-blue-600">{q.knowledgePoint}</p>
+                <h2 className="mt-2 font-semibold">
+                  第 {i + 1} 题：{q.question}
+                </h2>
 
-            <div className="space-y-4">
-              {questions.map((question, index) => {
-                const number = question.number ?? index + 1;
-                const isOpen = Boolean(showAnswers[number]);
+                <div className="mt-4 space-y-3">
+                  {q.options.map((option) => (
+                    <label key={option} className="flex cursor-pointer gap-3">
+                      <input
+                        type="radio"
+                        name={`question-${i}`}
+                        checked={answers[i] === option[0]}
+                        onChange={() =>
+                          setAnswers((old) => ({ ...old, [i]: option[0] }))
+                        }
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
 
-                return (
-                  <article
-                    key={`${number}-${index}`}
-                    className="rounded-2xl border border-gray-100 bg-white p-5 sm:p-6"
-                  >
-                    <div className="mb-3 flex flex-wrap items-center gap-2">
-                      <span className="rounded-lg bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
-                        第 {number} 题
-                      </span>
+                {showAnswers && (
+                  <div className="mt-5 rounded-xl bg-slate-50 p-4">
+                    <p className="font-semibold">
+                      正确答案：{q.answer}
+                    </p>
+                    <p className="mt-2 text-sm leading-6">
+                      {answers[i]
+                        ? answers[i] === q.answer
+                          ? "回答正确！"
+                          : "回答错误，再看看解析。"
+                        : "你还没有作答。"}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      解析：{q.explanation}
+                    </p>
+                  </div>
+                )}
+              </article>
+            ))}
 
-                      {question.type && (
-                        <span className="text-xs text-gray-400">
-                          {question.type}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="whitespace-pre-wrap text-sm leading-7 text-gray-800">
-                      {question.question}
-                    </div>
-
-                    {question.knowledgePoint && (
-                      <p className="mt-4 text-xs text-gray-400">
-                        知识点：{question.knowledgePoint}
-                      </p>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setShowAnswers((previous) => ({
-                          ...previous,
-                          [number]: !previous[number],
-                        }))
-                      }
-                      className="mt-5 flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700"
-                    >
-                      {isOpen ? "收起答案解析" : "查看答案解析"}
-                      {isOpen ? (
-                        <ChevronUp size={17} />
-                      ) : (
-                        <ChevronDown size={17} />
-                      )}
-                    </button>
-
-                    {isOpen && (
-                      <div className="mt-4 space-y-4 rounded-xl bg-gray-50 p-4">
-                        <div>
-                          <h3 className="mb-2 text-sm font-semibold">
-                            参考答案
-                          </h3>
-                          <p className="whitespace-pre-wrap text-sm leading-6 text-gray-700">
-                            {question.answer || "暂未提供参考答案"}
-                          </p>
-                        </div>
-
-                        <div>
-                          <h3 className="mb-2 text-sm font-semibold">
-                            解题解析
-                          </h3>
-                          <p className="whitespace-pre-wrap text-sm leading-6 text-gray-600">
-                            {question.explanation || "暂未提供解题解析"}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </article>
-                );
-              })}
-            </div>
+            <button
+              onClick={() => setShowAnswers(!showAnswers)}
+              className="w-full rounded-xl bg-slate-800 p-4 font-semibold text-white"
+            >
+              {showAnswers ? "隐藏答案与解析" : "提交答案并查看解析"}
+            </button>
           </section>
         )}
-      </section>
+      </div>
     </main>
   );
 }
