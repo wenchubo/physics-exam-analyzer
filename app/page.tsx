@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 const features = [
   {
     number: "01",
@@ -20,7 +18,7 @@ const features = [
     subtitle: "在一次次练习中找到突破口",
     description: "精选题目 · 自动批改 · 答题解析",
     color: "orange",
-    href: "/physics-exam-analyzer/practice.html",
+    href: "/physics-exam-analyzer/practice/",
     button: "开始练习 ↗",
   },
   {
@@ -30,7 +28,7 @@ const features = [
     subtitle: "把做错的题变成真正掌握的题",
     description: "错题回顾 · 反复练习 · 错因整理",
     color: "pink",
-    href: "/physics-exam-analyzer/practice.html",
+    href: "/physics-exam-analyzer/practice/",
     button: "复习错题 ↗",
   },
   {
@@ -40,7 +38,7 @@ const features = [
     subtitle: "看见自己的进步与薄弱知识点",
     description: "知识点统计 · 薄弱环节 · 学习反馈",
     color: "green",
-    href: "/physics-exam-analyzer/practice.html",
+    href: "/physics-exam-analyzer/practice/",
     button: "查看诊断 ↗",
   },
 ];
@@ -51,14 +49,41 @@ const experiments = [
   { icon: "⚖️", title: "力的合成", detail: "理解力的大小与方向" },
 ];
 
-export default function HomePage() {
-  const [showExamInfo, setShowExamInfo] = useState(false);
+const palettes: Record<
+  string,
+  { bg: string; icon: string; number: string }
+> = {
+  blue: {
+    bg: "bg-[#EAF2FB]",
+    icon: "bg-[#D7E7F9]",
+    number: "text-[#719AC8]",
+  },
+  orange: {
+    bg: "bg-[#FBF0E2]",
+    icon: "bg-[#F7DFC0]",
+    number: "text-[#C79253]",
+  },
+  pink: {
+    bg: "bg-[#F8EBE8]",
+    icon: "bg-[#F2D8D1]",
+    number: "text-[#C58D81]",
+  },
+  green: {
+    bg: "bg-[#EAF1E6]",
+    icon: "bg-[#D8E6CF]",
+    number: "text-[#819C70]",
+  },
+};
 
+export default function HomePage() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#FAF8F2] text-[#26354A]">
       {/* 顶部导航 */}
       <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10">
-        <a href="/physics-exam-analyzer/" className="flex items-center gap-3">
+        <a
+          href="/physics-exam-analyzer/"
+          className="flex items-center gap-3"
+        >
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#DCEBFA] text-2xl">
             ⚛
           </div>
@@ -70,7 +95,7 @@ export default function HomePage() {
           </div>
         </a>
 
-        <div className="hidden items-center gap-7 text-sm text-[#68778A] md:flex">
+        <nav className="hidden items-center gap-7 text-sm text-[#68778A] md:flex">
           <a href="#features" className="transition hover:text-[#4278B8]">
             学习空间
           </a>
@@ -80,10 +105,10 @@ export default function HomePage() {
           <a href="#about" className="transition hover:text-[#4278B8]">
             关于本站
           </a>
-        </div>
+        </nav>
 
         <a
-          href="/physics-exam-analyzer/practice.html"
+          href="/physics-exam-analyzer/practice/"
           className="rounded-full border border-[#D9E0E8] bg-white px-4 py-2 text-sm font-semibold transition hover:border-[#8FB7E8]"
         >
           进入练习 →
@@ -121,18 +146,21 @@ export default function HomePage() {
 
           <p className="mt-8 max-w-lg text-base leading-8 text-[#788494] md:text-lg">
             从一张试卷出发，找到知识漏洞；
+            <br />
             从一道错题出发，理解物理规律。
+            <br />
             在这里，把公式、练习和实验连接起来。
           </p>
 
+          {/* 已修改：点击后直接进入考试上传页面 */}
           <div className="mt-9 flex flex-wrap gap-3">
-            <button
-              onClick={() => setShowExamInfo(!showExamInfo)}
+            <a
+              href="/physics-exam-analyzer/exam/index.html"
               className="rounded-2xl bg-[#477FBD] px-6 py-4 font-bold text-white shadow-lg shadow-[#477FBD]/15 transition hover:-translate-y-0.5 hover:bg-[#376DA9]"
             >
               📄 开始试卷分析
               <span className="ml-3">↗</span>
-            </button>
+            </a>
 
             <a
               href="/physics-exam-analyzer/knowledge/index.html"
@@ -142,30 +170,6 @@ export default function HomePage() {
             </a>
           </div>
 
-          {showExamInfo && (
-            <div
-              id="exam-analysis"
-              className="mt-5 rounded-2xl border border-[#D9E5F2] bg-white p-5"
-            >
-              <div className="flex items-start gap-3">
-                <span className="text-2xl">📄</span>
-                <div>
-                  <h2 className="font-bold">试卷分析工作台</h2>
-                  <p className="mt-2 text-sm leading-6 text-[#788494]">
-                    这里将用于上传试卷、录入你的作答，并结合标准答案和评分细则分析错题。
-                    当前版本还没有接入文件识别与自动阅卷服务。
-                  </p>
-                  <div className="mt-4 rounded-xl bg-[#F5F7FA] p-3 text-sm leading-6">
-                    <p>后续需要准备：</p>
-                    <p>① 完整试卷（图片或 PDF）</p>
-                    <p>② 你的作答内容</p>
-                    <p>③ 标准答案及评分细则</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="mt-10 flex flex-wrap gap-6 text-sm text-[#8993A0]">
             <span>✳ 从基础概念开始</span>
             <span>✳ 记录每一次进步</span>
@@ -173,7 +177,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 右侧插画区域 */}
+        {/* 右侧实验插画 */}
         <div className="relative mx-auto w-full max-w-xl">
           <div className="absolute -right-3 top-5 h-24 w-24 rounded-full bg-[#F8DCA9]/60 blur-2xl" />
           <div className="absolute -left-4 bottom-8 h-28 w-28 rounded-full bg-[#BFD9F5]/70 blur-2xl" />
@@ -304,12 +308,7 @@ export default function HomePage() {
                 >
                   a = ?
                 </text>
-                <text
-                  x="54"
-                  y="258"
-                  fontSize="12"
-                  fill="#72879A"
-                >
+                <text x="54" y="258" fontSize="12" fill="#72879A">
                   MOTION EXPERIMENT
                 </text>
               </svg>
@@ -321,27 +320,27 @@ export default function HomePage() {
             </div>
 
             <div className="mt-5 grid grid-cols-3 gap-3">
-              <div className="rounded-2xl bg-white p-3">
-                <p className="text-xl">📐</p>
-                <p className="mt-2 text-sm font-bold">公式</p>
-                <p className="mt-1 text-xs text-[#8B96A3]">理解关系</p>
-              </div>
-              <div className="rounded-2xl bg-white p-3">
-                <p className="text-xl">🔍</p>
-                <p className="mt-2 text-sm font-bold">观察</p>
-                <p className="mt-1 text-xs text-[#8B96A3]">发现规律</p>
-              </div>
-              <div className="rounded-2xl bg-white p-3">
-                <p className="text-xl">💡</p>
-                <p className="mt-2 text-sm font-bold">思考</p>
-                <p className="mt-1 text-xs text-[#8B96A3]">解决问题</p>
-              </div>
+              {[
+                { icon: "📐", title: "公式", detail: "理解关系" },
+                { icon: "🔍", title: "观察", detail: "发现规律" },
+                { icon: "💡", title: "思考", detail: "解决问题" },
+              ].map((item) => (
+                <div key={item.title} className="rounded-2xl bg-white p-3">
+                  <p className="text-xl">{item.icon}</p>
+                  <p className="mt-2 text-sm font-bold">{item.title}</p>
+                  <p className="mt-1 text-xs text-[#8B96A3]">
+                    {item.detail}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
           <div className="absolute -left-4 top-24 hidden -rotate-6 rounded-2xl bg-white px-4 py-3 shadow-lg md:block">
             <span className="text-xl">✦</span>
-            <span className="ml-2 text-sm font-bold">好奇心，是第一推动力</span>
+            <span className="ml-2 text-sm font-bold">
+              好奇心，是第一推动力
+            </span>
           </div>
         </div>
       </section>
@@ -368,32 +367,6 @@ export default function HomePage() {
 
           <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {features.map((feature) => {
-              const palettes: Record<
-                string,
-                { bg: string; icon: string; number: string }
-              > = {
-                blue: {
-                  bg: "bg-[#EAF2FB]",
-                  icon: "bg-[#D7E7F9]",
-                  number: "text-[#719AC8]",
-                },
-                orange: {
-                  bg: "bg-[#FBF0E2]",
-                  icon: "bg-[#F7DFC0]",
-                  number: "text-[#C79253]",
-                },
-                pink: {
-                  bg: "bg-[#F8EBE8]",
-                  icon: "bg-[#F2D8D1]",
-                  number: "text-[#C58D81]",
-                },
-                green: {
-                  bg: "bg-[#EAF1E6]",
-                  icon: "bg-[#D8E6CF]",
-                  number: "text-[#819C70]",
-                },
-              };
-
               const palette = palettes[feature.color];
 
               return (
@@ -412,15 +385,15 @@ export default function HomePage() {
                     </span>
                   </div>
 
-                  <h3 className="mt-6 text-xl font-black">
-                    {feature.title}
-                  </h3>
+                  <h3 className="mt-6 text-xl font-black">{feature.title}</h3>
 
                   <p className="mt-3 min-h-[48px] text-sm leading-6 text-[#6F7D8D]">
                     {feature.subtitle}
                   </p>
 
-                  <div className={`mt-5 rounded-xl px-3 py-3 text-xs leading-5 ${palette.bg} text-[#68778A]`}>
+                  <div
+                    className={`mt-5 rounded-xl px-3 py-3 text-xs leading-5 ${palette.bg} text-[#68778A]`}
+                  >
                     {feature.description}
                   </div>
 
@@ -522,7 +495,10 @@ export default function HomePage() {
       </section>
 
       {/* 页脚 */}
-      <footer id="about" className="border-t border-[#EAE7DE] px-6 py-8 md:px-10">
+      <footer
+        id="about"
+        className="border-t border-[#EAE7DE] px-6 py-8 md:px-10"
+      >
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 text-sm text-[#8993A0] md:flex-row md:items-center">
           <div>
             <p className="font-black text-[#536273]">⚛ 物理实验室</p>
