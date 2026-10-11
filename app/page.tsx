@@ -444,9 +444,20 @@ export default function HomePage() {
               <p className="mt-5 max-w-md text-sm leading-7 text-[#6D7D89] md:text-base">
                 从观察小车的运动开始，把抽象的物理规律变成能够观察、操作和分析的实验。
               </p>
-              <div className="mt-7 inline-flex rounded-xl border border-[#D2DDE3] bg-white/70 px-4 py-3 text-sm text-[#6F8797]">
-                🧪 互动实验功能正在规划中
-              </div>
+            <a
+  href="https://wenchubo.github.io/acceleration-lab/"
+  target="_blank"
+  rel="noreferrer"
+  className="mt-7 inline-flex items-center gap-3 rounded-2xl border border-white bg-white/80 px-4 py-3 text-sm shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+>
+  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#DCEAF8] text-lg">
+    🧪
+  </span>
+  <span>
+    <span className="block font-bold text-[#344B5B]">互动实验室已开放</span>
+    <span className="mt-1 block text-xs text-[#7B8D99]">点击进入加速度实验 ↗</span>
+  </span>
+</a>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
