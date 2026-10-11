@@ -1,267 +1,607 @@
 "use client";
 
-import { useRef, useState } from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 
-type ExamFile = {
-  file: File;
-  preview?: string;
+const answerKey: Record<number, string> = {
+  1: "C",
+  2: "C",
+  3: "D",
+  4: "C",
+  5: "C",
+  6: "D",
+  7: "A",
+  8: "A",
+  9: "C",
+  10: "D",
+  11: "D",
+  12: "A",
+  13: "C",
+  14: "D",
+  15: "C",
+  16: "B",
+  17: "D",
+  18: "B",
+  19: "D",
+  20: "CD",
+  21: "BCD",
+  22: "BD",
+  23: "BC",
+  24: "AD",
 };
 
+const questions = Array.from({ length: 31 }, (_, i) => i + 1);
+
+const topics: Record<number, string> = {
+  1: "运动的描述与基本概念",
+  2: "运动的描述与基本概念",
+  3: "运动的描述与基本概念",
+  4: "运动的描述与基本概念",
+  5: "运动的描述与基本概念",
+  6: "匀变速直线运动",
+  7: "匀变速直线运动",
+  8: "匀变速直线运动",
+  9: "匀变速直线运动",
+  10: "匀变速直线运动",
+};
+
+function normalizeAnswer(value: string) {
+  return value.toUpperCase().replace(/[^A-Z]/g, "").split("").sort().join("");
+}
+
+function readNumber(value: string) {
+  if (value.trim() === "") return 0;
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, number) : 0;
+}
+
 export default function ExamPage() {
-  const [files, setFiles] = useState<ExamFile[]>([]);
-  const [dragging, setDragging] = useState(false);
-  const [message, setMessage] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [earned, setEarned] = useState<Record<number, string>>({});
+  const [maximum, setMaximum] = useState<Record<number, string>>({});
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [saved, setSaved] = useState(false);
 
-  function addFiles(selected: FileList | File[]) {
-    const incoming = Array.from(selected);
-    const validFiles: ExamFile[] = [];
-    const errors: string[] = [];
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("physics-exam-analysis-v1");
 
-    incoming.forEach((file) => {
-      const isPDF = file.type === "application/pdf" ||
-        file.name.toLowerCase().endsWith(".pdf");
-      const isImage = file.type.startsWith("image/");
-
-      if (!isPDF && !isImage) {
-        errors.push(`${file.name}：只支持 PDF 或图片`);
-        return;
+      if (raw) {
+        const data = JSON.parse(raw);
+        setAnswers(data.answers || {});
+        setEarned(data.earned || {});
+        setMaximum(data.maximum || {});
       }
-
-      if (file.size > 20 * 1024 * 1024) {
-        errors.push(`${file.name}：文件不能超过 20 MB`);
-        return;
-      }
-
-      const preview = isImage ? URL.createObjectURL(file) : undefined;
-      validFiles.push({ file, preview });
-    });
-
-    setFiles((previous) => {
-      const combined = [...previous, ...validFiles];
-      const seen = new Set<string>();
-      return combined.filter(({ file }) => {
-        const key = `${file.name}-${file.size}-${file.lastModified}`;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-    });
-
-    setMessage(
-      errors.length
-        ? errors.join("；")
-        : validFiles.length
-          ? `已添加 ${validFiles.length} 个文件`
-          : "请选择 PDF 或图片文件"
-    );
-  }
-
-  function removeFile(index: number) {
-    setFiles((previous) => {
-      const target = previous[index];
-      if (target?.preview) URL.revokeObjectURL(target.preview);
-      return previous.filter((_, i) => i !== index);
-    });
-  }
-
-  function clearFiles() {
-    files.forEach(({ preview }) => {
-      if (preview) URL.revokeObjectURL(preview);
-    });
-    setFiles([]);
-    setMessage("");
-    if (inputRef.current) inputRef.current.value = "";
-  }
-
-  function formatSize(bytes: number) {
-    if (bytes < 1024 * 1024) {
-      return `${(bytes / 1024).toFixed(1)} KB`;
+    } catch {
+      console.warn("读取本地记录失败");
     }
-    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "physics-exam-analysis-v1",
+        JSON.stringify({ answers, earned, maximum })
+      );
+      setSaved(true);
+    } catch {
+      setSaved(false);
+    }
+  }, [answers, earned, maximum]);
+
+  const objectiveQuestions = questions.filter((q) => q <= 24);
+
+  const gradedQuestions = objectiveQuestions.filter(
+    (q) => (answers[q] || "").trim() !== ""
+  );
+
+  const correctQuestions = gradedQuestions.filter(
+    (q) => normalizeAnswer(answers[q] || "") === answerKey[q]
+  );
+
+  const wrongQuestions = gradedQuestions.filter(
+    (q) => normalizeAnswer(answers[q] || "") !== answerKey[q]
+  );
+
+  const manualEarned = questions
+    .filter((q) => q >= 25)
+    .reduce((sum, q) => sum + readNumber(earned[q] || ""), 0);
+
+  const manualMaximum = questions
+    .filter((q) => q >= 25)
+    .reduce((sum, q) => sum + readNumber(maximum[q] || ""), 0);
+
+  function updateAnswer(q: number, value: string) {
+    setAnswers((old) => ({ ...old, [q]: value }));
+  }
+
+  function toggleChoice(q: number, option: string) {
+    const current = normalizeAnswer(answers[q] || "");
+    const next = current.includes(option)
+      ? current.replace(option, "")
+      : current + option;
+
+    updateAnswer(q, next);
+  }
+
+  function handleImages(files: FileList | null) {
+    if (!files) return;
+
+    const selected = Array.from(files).filter((file) =>
+      file.type.startsWith("image/")
+    );
+
+    const urls = selected.map((file) => URL.createObjectURL(file));
+    setImageUrls((old) => [...old, ...urls]);
+  }
+
+  function clearAll() {
+    if (!window.confirm("确定清空全部答案和分数吗？此操作不可撤销。")) {
+      return;
+    }
+
+    setAnswers({});
+    setEarned({});
+    setMaximum({});
+    localStorage.removeItem("physics-exam-analysis-v1");
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f5ef] text-[#25364a]">
-      <header className="border-b border-[#e7e2d7] bg-white/80">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link href="/physics-exam-analyzer/" className="font-bold tracking-wide">
-            ◈ 物理实验室
-          </Link>
-          <Link
-            href="/physics-exam-analyzer/"
-            className="rounded-full border border-[#e4dfd4] px-4 py-2 text-sm hover:bg-[#f7f5ef]"
-          >
-            ← 返回首页
-          </Link>
-        </div>
+    <main
+      style={{
+        maxWidth: 1000,
+        margin: "0 auto",
+        padding: "28px 18px 60px",
+        color: "#182230",
+        fontFamily: "Arial, 'Microsoft YaHei', sans-serif",
+      }}
+    >
+      <a
+        href="/physics-exam-analyzer/"
+        style={{ color: "#52657a", textDecoration: "none" }}
+      >
+        ← 返回首页
+      </a>
+
+      <header style={{ marginTop: 26, marginBottom: 28 }}>
+        <p style={{ color: "#5475b5", fontWeight: 700 }}>
+          PHYSICS · EXAM ANALYSIS
+        </p>
+
+        <h1 style={{ fontSize: 34, margin: "8px 0" }}>
+          高一物理月考分析
+        </h1>
+
+        <p style={{ color: "#637083", lineHeight: 1.8 }}>
+          录入作答、核对答案、统计失分，逐步建立自己的错题档案。
+        </p>
       </header>
 
-      <section className="mx-auto max-w-4xl px-5 py-12 md:py-16">
-        <div className="mb-8">
-          <p className="mb-3 text-sm font-semibold tracking-[0.2em] text-[#d97745]">
-            PHYSICS LAB · EXAM ANALYSIS
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-            让每一道错题，都有迹可循。
-          </h1>
-          <p className="mt-4 max-w-2xl leading-7 text-[#718096]">
-            上传你的物理试卷，整理作答与评分信息，为后续的失分分析和知识点诊断做好准备。
-          </p>
-        </div>
+      <section style={cardStyle}>
+        <h2 style={headingStyle}>01 / 作答图片</h2>
 
-        <div className="rounded-[28px] border border-[#e8e2d7] bg-white p-5 shadow-sm md:p-8">
-          <div className="mb-6 flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-bold">第一步 · 上传试卷</h2>
-              <p className="mt-1 text-sm text-[#8792a0]">
-                支持 PDF、JPG、PNG 等常见图片格式
-              </p>
-            </div>
-            <span className="rounded-full bg-[#e9f2fa] px-3 py-1.5 text-xs font-semibold text-[#426b8e]">
-              单个文件 ≤ 20 MB
-            </span>
-          </div>
+        <p style={paragraphStyle}>
+          选择试卷或答题纸照片，可以在页面中预览。当前版本尚未接入
+          OCR，图片不会自动转化为答案，需要你核对后手动填写。
+        </p>
 
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) => handleImages(e.target.files)}
+          style={{ maxWidth: "100%" }}
+        />
+
+        {imageUrls.length > 0 && (
           <div
-            onDragOver={(event) => {
-              event.preventDefault();
-              setDragging(true);
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+              gap: 12,
+              marginTop: 18,
             }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={(event) => {
-              event.preventDefault();
-              setDragging(false);
-              addFiles(event.dataTransfer.files);
-            }}
-            onClick={() => inputRef.current?.click()}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                inputRef.current?.click();
-              }
-            }}
-            className={`cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center transition md:p-12 ${
-              dragging
-                ? "border-[#d97745] bg-[#fff4ec]"
-                : "border-[#d8dfdf] bg-[#fbfcfa] hover:border-[#83a9c4] hover:bg-[#f5f9fb]"
-            }`}
           >
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#e9f2fa] text-3xl">
-              ↑
-            </div>
-            <p className="text-lg font-semibold">点击选择文件，或拖到这里</p>
-            <p className="mt-2 text-sm text-[#8792a0]">
-              可以添加试卷、答题卡或评分细则
-            </p>
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                inputRef.current?.click();
-              }}
-              className="mt-6 rounded-full bg-[#29465f] px-6 py-3 text-sm font-semibold text-white hover:bg-[#1f374b]"
-            >
-              选择本地文件
-            </button>
-            <input
-              ref={inputRef}
-              type="file"
-              accept=".pdf,image/*"
-              multiple
-              className="hidden"
-              onChange={(event) => {
-                if (event.target.files) addFiles(event.target.files);
-                event.target.value = "";
-              }}
-            />
+            {imageUrls.map((url, index) => (
+              <img
+                key={url}
+                src={url}
+                alt={`作答图片 ${index + 1}`}
+                style={{
+                  width: "100%",
+                  maxHeight: 300,
+                  objectFit: "contain",
+                  border: "1px solid #d9e0e8",
+                  borderRadius: 10,
+                }}
+              />
+            ))}
           </div>
+        )}
+      </section>
 
-          {message && (
-            <p className="mt-4 rounded-xl bg-[#f4f6f5] px-4 py-3 text-sm text-[#526879]">
-              {message}
-            </p>
-          )}
+      <section style={cardStyle}>
+        <h2 style={headingStyle}>02 / 客观题答案</h2>
 
-          <div className="mt-8">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-bold">
-                已选择文件 <span className="text-[#d97745]">({files.length})</span>
-              </h3>
-              {files.length > 0 && (
-                <button
-                  type="button"
-                  onClick={clearFiles}
-                  className="text-sm text-[#8792a0] hover:text-red-600"
+        <p style={paragraphStyle}>
+          单选题直接选择 A、B、C、D；多选题可以同时选择多个选项。
+          未填写的题目不会被统计为错误。
+        </p>
+
+        <div style={{ display: "grid", gap: 12 }}>
+          {objectiveQuestions.map((q) => {
+            const multi = q >= 20;
+            const isFilled = (answers[q] || "").trim() !== "";
+            const isCorrect =
+              isFilled &&
+              normalizeAnswer(answers[q] || "") === answerKey[q];
+
+            return (
+              <div
+                key={q}
+                style={{
+                  padding: 15,
+                  border: "1px solid #e0e6ed",
+                  borderRadius: 12,
+                  background: isFilled
+                    ? isCorrect
+                      ? "#f0f9f3"
+                      : "#fff5f2"
+                    : "#ffffff",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: 10,
+                    flexWrap: "wrap",
+                  }}
                 >
-                  全部清除
-                </button>
-              )}
-            </div>
+                  <strong>
+                    第 {q} 题
+                    {multi ? " · 多选题" : " · 单选题"}
+                  </strong>
 
-            {files.length === 0 ? (
-              <div className="rounded-xl border border-[#eee9e0] px-4 py-8 text-center text-sm text-[#9aa3ad]">
-                还没有文件。选择试卷后，文件信息会显示在这里。
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {files.map(({ file, preview }, index) => (
-                  <div
-                    key={`${file.name}-${file.size}-${file.lastModified}`}
-                    className="flex items-center gap-4 rounded-2xl border border-[#eee9e0] p-4"
-                  >
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#f0f4f6] text-xs font-bold text-[#426b8e]">
-                      {preview ? (
-                        <img
-                          src={preview}
-                          alt={file.name}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        "PDF"
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="break-all font-medium">{file.name}</p>
-                      <p className="mt-1 text-xs text-[#8792a0]">
-                        {formatSize(file.size)} ·{" "}
-                        {file.type || "文件类型待确认"}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeFile(index)}
-                      aria-label={`删除 ${file.name}`}
-                      className="rounded-full px-3 py-2 text-sm text-[#8792a0] hover:bg-red-50 hover:text-red-600"
+                  {isFilled && (
+                    <span
+                      style={{
+                        color: isCorrect ? "#187344" : "#b54732",
+                        fontSize: 14,
+                      }}
                     >
-                      删除
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                      {isCorrect ? "答案正确" : "答案不一致"}
+                    </span>
+                  )}
+                </div>
 
-          <div className="mt-8 rounded-2xl bg-[#fff6ed] p-5">
-            <h3 className="font-bold text-[#9a5b32]">接下来会做什么？</h3>
-            <div className="mt-3 grid gap-3 text-sm leading-6 text-[#856b59] md:grid-cols-3">
-              <p>01 · 整理你的作答</p>
-              <p>02 · 对照标准答案与评分细则</p>
-              <p>03 · 生成错题与知识点分析</p>
+                {multi ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 10,
+                      flexWrap: "wrap",
+                      marginTop: 12,
+                    }}
+                  >
+                    {["A", "B", "C", "D"].map((option) => (
+                      <label
+                        key={option}
+                        style={{
+                          padding: "8px 14px",
+                          border: "1px solid #d5dde7",
+                          borderRadius: 8,
+                          cursor: "pointer",
+                          background: normalizeAnswer(
+                            answers[q] || ""
+                          ).includes(option)
+                            ? "#e8efff"
+                            : "#ffffff",
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={normalizeAnswer(
+                            answers[q] || ""
+                          ).includes(option)}
+                          onChange={() => toggleChoice(q, option)}
+                        />{" "}
+                        {option}
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 10,
+                      marginTop: 12,
+                    }}
+                  >
+                    {["A", "B", "C", "D"].map((option) => (
+                      <label
+                        key={option}
+                        style={{
+                          padding: "8px 14px",
+                          border: "1px solid #d5dde7",
+                          borderRadius: 8,
+                          cursor: "pointer",
+                          background:
+                            answers[q] === option ? "#e8efff" : "#ffffff",
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name={`question-${q}`}
+                          checked={answers[q] === option}
+                          onChange={() => updateAnswer(q, option)}
+                        />{" "}
+                        {option}
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {isFilled && (
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: "#657386",
+                      marginBottom: 0,
+                    }}
+                  >
+                    标准答案：{answerKey[q]}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={headingStyle}>03 / 实验题与计算题评分</h2>
+
+        <p style={paragraphStyle}>
+          第 25—31 题请根据老师的评分细则填写得分和满分。
+          目前不自动判断这些题目的计算过程是否正确。
+        </p>
+
+        <div style={{ display: "grid", gap: 10 }}>
+          {questions.filter((q) => q >= 25).map((q) => (
+            <div
+              key={q}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: 12,
+                alignItems: "center",
+                padding: 12,
+                borderBottom: "1px solid #e4e9ef",
+              }}
+            >
+              <strong>第 {q} 题</strong>
+
+              <label style={{ fontSize: 13 }}>
+                得分
+                <input
+                  type="number"
+                  min="0"
+                  value={earned[q] ?? ""}
+                  onChange={(e) =>
+                    setEarned((old) => ({
+                      ...old,
+                      [q]: e.target.value,
+                    }))
+                  }
+                  style={inputStyle}
+                  placeholder="得分"
+                />
+              </label>
+
+              <label style={{ fontSize: 13 }}>
+                满分
+                <input
+                  type="number"
+                  min="0"
+                  value={maximum[q] ?? ""}
+                  onChange={(e) =>
+                    setMaximum((old) => ({
+                      ...old,
+                      [q]: e.target.value,
+                    }))
+                  }
+                  style={inputStyle}
+                  placeholder="满分"
+                />
+              </label>
             </div>
-            <p className="mt-4 text-xs leading-5 text-[#9a8778]">
-              当前版本仅在浏览器中选择和预览文件，不会将文件上传到服务器，也尚未接入 OCR 或 AI 自动批改。刷新或离开页面后，所选文件不会保留。
-            </p>
-          </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={headingStyle}>04 / 分析报告</h2>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+            gap: 12,
+          }}
+        >
+          <Stat
+            label="已填写客观题"
+            value={`${gradedQuestions.length}/24`}
+          />
+          <Stat
+            label="客观题答对"
+            value={`${correctQuestions.length}`}
+          />
+          <Stat
+            label="客观题答错"
+            value={`${wrongQuestions.length}`}
+          />
+          <Stat
+            label="主观题已录得分"
+            value={`${manualEarned}`}
+          />
         </div>
 
-        <p className="mt-6 text-center text-xs leading-6 text-[#9aa3ad]">
-          物理实验室 · 把每一次失分，变成下一次进步的线索。
+        <div style={{ marginTop: 22 }}>
+          <h3>客观题错题清单</h3>
+
+          {wrongQuestions.length === 0 ? (
+            <p style={paragraphStyle}>
+              {gradedQuestions.length === 0
+                ? "请先填写你的答案。"
+                : "目前已填写的客观题全部与标准答案一致。"}
+            </p>
+          ) : (
+            <div style={{ display: "grid", gap: 10 }}>
+              {wrongQuestions.map((q) => (
+                <div
+                  key={q}
+                  style={{
+                    padding: 13,
+                    border: "1px solid #f0d3cc",
+                    borderRadius: 10,
+                    background: "#fff9f7",
+                  }}
+                >
+                  <strong>第 {q} 题</strong>
+
+                  <p style={{ margin: "8px 0" }}>
+                    你的答案：{normalizeAnswer(answers[q] || "")}
+                    {"　"}标准答案：{answerKey[q]}
+                  </p>
+
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#657386",
+                      fontSize: 13,
+                    }}
+                  >
+                    知识点：
+                    {topics[q] || "待根据原题和评分细则补充"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div style={{ marginTop: 24 }}>
+          <h3>主观题分数统计</h3>
+          <p style={paragraphStyle}>
+            已录入得分：{manualEarned} 分
+          </p>
+          <p style={paragraphStyle}>
+            已录入满分：{manualMaximum} 分
+          </p>
+          <p style={paragraphStyle}>
+            已录入部分的失分：{Math.max(0, manualMaximum - manualEarned)} 分
+          </p>
+        </div>
+
+        <p
+          style={{
+            color: "#657386",
+            fontSize: 13,
+            marginTop: 22,
+          }}
+        >
+          当前客观题统计只计算题目数量，不代表整张试卷的实际分数。
+          后续需要录入每道客观题的分值，才能计算完整总分。
         </p>
       </section>
+
+      <section style={cardStyle}>
+        <h2 style={headingStyle}>05 / 本地记录</h2>
+
+        <p style={paragraphStyle}>
+          {saved
+            ? "答案和分数已尝试保存到当前浏览器。"
+            : "暂时无法确认保存成功，请不要清除浏览器数据。"}
+        </p>
+
+        <p style={{ ...paragraphStyle, fontSize: 13 }}>
+          当前保存的是答案和分数，不包含上传图片。图片预览仅在当前页面有效。
+          更换浏览器或清除网站数据后，本地记录可能丢失。
+        </p>
+
+        <button onClick={clearAll} style={dangerButtonStyle}>
+          清空本次记录
+        </button>
+      </section>
+
+      <footer
+        style={{
+          color: "#8993a2",
+          fontSize: 12,
+          textAlign: "center",
+          marginTop: 30,
+        }}
+      >
+        高一物理 · 错题分析工具
+      </footer>
     </main>
   );
 }
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div
+      style={{
+        padding: 16,
+        border: "1px solid #e0e6ed",
+        borderRadius: 12,
+      }}
+    >
+      <p style={{ color: "#657386", fontSize: 13, margin: 0 }}>
+        {label}
+      </p>
+      <strong style={{ fontSize: 25, display: "block", marginTop: 8 }}>
+        {value}
+      </strong>
+    </div>
+  );
+}
+
+const cardStyle = {
+  background: "#ffffff",
+  border: "1px solid #e0e6ed",
+  borderRadius: 16,
+  padding: 20,
+  marginBottom: 20,
+};
+
+const headingStyle = {
+  fontSize: 21,
+  marginTop: 0,
+  marginBottom: 14,
+};
+
+const paragraphStyle = {
+  color: "#657386",
+  lineHeight: 1.8,
+};
+
+const inputStyle = {
+  display: "block",
+  width: "100%",
+  boxSizing: "border-box" as const,
+  padding: 9,
+  marginTop: 6,
+  border: "1px solid #d5dde7",
+  borderRadius: 7,
+};
+
+const dangerButtonStyle = {
+  padding: "10px 16px",
+  border: "1px solid #e4b9b1",
+  borderRadius: 8,
+  background: "#fff5f2",
+  color: "#a33c2d",
+  cursor: "pointer",
+};
