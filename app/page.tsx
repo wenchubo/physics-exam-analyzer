@@ -44,9 +44,27 @@ const features = [
 ];
 
 const experiments = [
-  { icon: "🚗", title: "加速度实验", detail: "小车 · 轨道 · 运动数据" },
-  { icon: "📈", title: "运动图像", detail: "观察位移、速度与时间" },
-  { icon: "⚖️", title: "力的合成", detail: "理解力的大小与方向" },
+  {
+    icon: "🚗",
+    title: "加速度实验",
+    detail: "小车 · 轨道 · 运动数据",
+    href: "https://wenchubo.github.io/acceleration-lab/",
+    status: "实验室已开放",
+  },
+  {
+    icon: "📈",
+    title: "运动图像",
+    detail: "观察位移、速度与时间",
+    href: "https://wenchubo.github.io/acceleration-lab/",
+    status: "进入实验",
+  },
+  {
+    icon: "⚖️",
+    title: "力的合成",
+    detail: "理解力的大小与方向",
+    href: "https://wenchubo.github.io/acceleration-lab/",
+    status: "进入实验",
+  },
 ];
 
 const palettes: Record<
